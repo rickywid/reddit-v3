@@ -1,4 +1,15 @@
 import { createContext } from 'react';
 
-const UserContext:any = createContext(null);
+const UserContext = createContext<any>({
+    id: null,
+    picture: '',
+    username: '',
+    categories: [
+        {
+            name: '',
+            subreddits: []
+        }
+    ]
+});
+
 export default UserContext;

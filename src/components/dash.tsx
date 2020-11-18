@@ -9,7 +9,6 @@ interface ICategories {
 }
 
 interface IResponseData {
-    subreddit_name: string,
     data: {
         data: any
     }[]
@@ -23,22 +22,34 @@ interface ISubreddits {
     }[]
 }
 
+interface IGetStartedData {
+    subreddits: {
+        name: string
+    }[]
+}
+
 const User = () => {
     const { user, setUser } = useContext(UserContext);
-    const [selectedCategory, setCategory] = useState<string>('All');
-    const [subreddits, setSubs] = useState<ISubreddits[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [selectedCategory, setCategory] = useState<string>('All');            // Selected Category value
+    const [intialSubreddits, setInitialSubreddits] = useState<string[]>([]);    // State will be initialized if user has no subreddits
+    const [subreddits, setSubs] = useState<ISubreddits[]>([]);                  // State will be initialized if the user is already following subreddits
+    const [isLoading, setIsLoading] = useState<boolean>(true);                  // Check if fetch requests has completed
+    const [formSubmitting, setFormSubmitting] = useState<boolean>(false);       // Check if the form is currently being submitted when <GetStartedForm /> component is mounted
 
     useEffect(() => {
-        fetchSubs()
+        const fetch = async() => {
+            const req: ISubreddits[] = await fetchSubs();
+            setSubs(req);
+            setIsLoading(false);
+        }
 
-    }, [selectedCategory]);
+        fetch();
+    }, [selectedCategory, formSubmitting]);
 
     const logout = async () => {
         const fetch = new Fetch();
-
         localStorage.removeItem('userId');
-        await fetch.logout('/auth/logout')
+        await fetch.logout('/auth/logout');
         setUser(null);
     }
 
@@ -48,21 +59,38 @@ const User = () => {
         setCategory(value);
     }
 
-    const fetchSubs = async () => {
-        const { categories } = user.data;
+    /**
+     * If user has no subreddits, <GetStartedForm /> component will render.
+     * After user submits form, form data(subreddits) will be passed to formSubmit()
+     * 
+     * @param values 
+     */
+    const formSubmit = (values: IGetStartedData) => {
+        setInitialSubreddits(values.subreddits.map((s: {name: string}) => s.name));
+        setFormSubmitting(true);
+    }
 
+    /**
+     * fetchSubs() will make a request to fetch the subreddit(s) data
+     */
+    const fetchSubs = async () => {
+        // TODO: Refactor
+        const { categories } = user;
+                
         if (selectedCategory === 'All') {
 
             // Get all the subreddits for the selected categories
             const data: [IResponseData][] = await Promise.all(categories.map(async (category: ICategories) => {
-                const res = await Promise.all(category.subreddits.map(subreddit => (
+
+                // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
+                const subreddits = category.subreddits.length ? category.subreddits : intialSubreddits;
+                const res = await Promise.all(subreddits.map(subreddit => (
                     fetch(`https://www.reddit.com/r/${subreddit}.json`))));
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             }));
 
-            setSubs(build(data, categories));
-            setIsLoading(false);
+            return build(data,categories);
 
         } else {
             const category = categories
@@ -72,20 +100,25 @@ const User = () => {
                 fetch(`https://www.reddit.com/r/${subreddit}.json`))));
             const data = await Promise.all(res.map((r: any) => r.json()));
 
-            setSubs(build(data));
-            setIsLoading(false);
+            return build(data);
         }
     }
 
-    // build the data structure
+    /**
+     * Build the data structure
+     */
     const build = (x: any, categories?: any) => {
         let arr: any[] = [];
 
         if (categories) {
             // loop through categories
             arr = categories.map((category: any, i: number) => {
-                // loop through subreddits in category
-                const data = category.subreddits.map((s: string, j: number) => {
+
+                /**
+                 *  When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
+                 */
+                const subreddits = category.subreddits.length ? category.subreddits : intialSubreddits;
+                const data = subreddits.map((s: string, j: number) => {
                     const data: any = x[i][j];
 
                     return {
@@ -117,18 +150,18 @@ const User = () => {
 
     return isLoading ? <div>loading</div> : (
         <div>
-            {console.log(subreddits[0])}
+            
             {subreddits[0].data.length ? (
                 <div>
                     <div>
                         <p>Category: {selectedCategory}</p>
                         <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory}>
                             <option value="All">All</option>
-                            {user.data.categories.map((category: ICategories, i: number) => {
+                            {user.categories.map((category: ICategories, i: number) => {
                                 return <option key={`${i}-${category}`} value={category.name}>{category.name}</option>
                             })}
                         </select>
-                        {user.data.categories.map((category: ICategories, i: number) => {
+                        {user.categories.map((category: ICategories, i: number) => {
                             return (
                                 <div key={`${i}-${category}`}>
                                     <h3>{category.name}</h3>
@@ -193,7 +226,7 @@ const User = () => {
                         <h2>Start Adding Your Favourite Subreddits</h2>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima, eveniet soluta, praesentium ea ut repudiandae, perspiciatis neque corrupti perferendis!</p>
 
-                        <GetStartedForm fetchSubs={fetchSubs} />
+                        <GetStartedForm formSubmit={formSubmit} />
                     </div>
                 )}
         </div >

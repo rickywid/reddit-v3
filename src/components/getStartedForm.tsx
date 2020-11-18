@@ -1,5 +1,5 @@
 import React from 'react';
-import { Formik, Field, Form, ErrorMessage, FieldArray } from 'formik';
+import { Formik, Field, Form, FieldArray } from 'formik';
 import Fetch from '../lib/fetch';
 
 const initialValues = {
@@ -11,7 +11,7 @@ const initialValues = {
 };
 
 interface IProps {
-    fetchSubs: Function;
+    formSubmit: Function;
 }
 
 interface IFormData {
@@ -20,16 +20,22 @@ interface IFormData {
     }[]
 }
 
-const GetStartedForm = ({ fetchSubs }: IProps) => {
+
+/**
+ * Component will render if user has no current subreddits saved
+ * 
+ * @param param0 
+ */
+
+const GetStartedForm = ({ formSubmit }: IProps) => {
     const request = new Fetch();
 
     const handleSubmit = (async(values: IFormData) => {
         try {
             await request.updateSubreddits(values);
+            formSubmit(values);
         } catch(e) {
             console.log(e)
-        } finally {
-            fetchSubs();
         } 
     })
 

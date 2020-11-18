@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import Routes from './routes';
 import './App.scss';
-import UserContext from './context/userContext';
 
 function App() {
-
-  const [user, setUser] = useState(null);
-
-  return (
-    <div className="App">
-      <UserContext.Provider value={{user, setUser}}>
-     {Routes}
-     </UserContext.Provider>
-    </div>
-  );
+    return (
+        <div className="App">
+            <Link to={'/'}>Home</Link>
+            <Link to={'/settings'}>Settings</Link>
+            {Routes}
+        </div>
+    );
 }
 
 export default App;
