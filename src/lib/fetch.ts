@@ -24,11 +24,36 @@ class Fetch {
         return this.request(`/user/${id}`, this.options)
     }
 
+    // Todo: Rename function to "updateCategories"
     updateSubreddits(value: any) {
         this.options['method'] = 'PUT';
         this.options['body'] = JSON.stringify(value);
         return this.request(`/category`, this.options)
     }
+
+    updateSubreddit(value: any) {
+        this.options['method'] = 'PUT';
+        this.options['body'] = JSON.stringify(value);
+        return this.request(`/subreddit`, this.options)
+    }
+
+    createCategory(value: {name: string}) {
+        this.options['method'] = 'POST';
+        this.options['body'] = JSON.stringify(value);
+        return this.request(`/category`, this.options)
+    }
+
+    renameCategory(value: {id: number, category: string}) {
+        this.options['method'] = 'PUT';
+        this.options['body'] = JSON.stringify(value);
+        return this.request(`/category/rename`, this.options)
+    }
+
+    deleteCategory(value: {mergedSubs: string[], category: string}) {
+        this.options['method'] = 'PUT';
+        this.options['body'] = JSON.stringify(value);
+        return this.request(`/category/delete`, this.options)
+    };
 
     async request(url:string, headers:{}) {
         return await fetch(`${this.domain}${url}`, headers).then((res:Response) => {

@@ -3,14 +3,16 @@ import UserContext from '../context/userContext';
 import Fetch from '../lib/fetch';
 import GetStartedForm from './getStartedForm';
 
-interface ICategories {
+
+// Todo: Clean up interfaces
+export interface ICategories {
     name: string;
     subreddits: string[];
 }
 
 interface IResponseData {
     data: {
-        data: any
+        data: any;
     }[]
 }
 
@@ -18,15 +20,18 @@ interface ISubreddits {
     category_name: string,
     data: {
         subreddit_name: string;
-        data: IResponseData[]
+        data: IResponseData[];
     }[]
 }
 
-interface IGetStartedData {
+export interface IGetStartedData {
     subreddits: {
-        name: string
+        category?: string;
+        name: string;
     }[]
 }
+
+
 
 const User = () => {
     const { user, setUser } = useContext(UserContext);
@@ -37,9 +42,10 @@ const User = () => {
     const [formSubmitting, setFormSubmitting] = useState<boolean>(false);       // Check if the form is currently being submitted when <GetStartedForm /> component is mounted
 
     useEffect(() => {
-        const fetch = async() => {
+        const fetch = async () => {
             const req: ISubreddits[] = await fetchSubs();
             setSubs(req);
+            console.log(subreddits)
             setIsLoading(false);
         }
 
@@ -66,7 +72,7 @@ const User = () => {
      * @param values 
      */
     const formSubmit = (values: IGetStartedData) => {
-        setInitialSubreddits(values.subreddits.map((s: {name: string}) => s.name));
+        setInitialSubreddits(values.subreddits.map((s: { name: string }) => s.name));
         setFormSubmitting(true);
     }
 
@@ -76,7 +82,7 @@ const User = () => {
     const fetchSubs = async () => {
         // TODO: Refactor
         const { categories } = user;
-                
+
         if (selectedCategory === 'All') {
 
             // Get all the subreddits for the selected categories
@@ -90,7 +96,7 @@ const User = () => {
                 return req;
             }));
 
-            return build(data,categories);
+            return build(data, categories);
 
         } else {
             const category = categories
@@ -150,8 +156,7 @@ const User = () => {
 
     return isLoading ? <div>loading</div> : (
         <div>
-            
-            {subreddits[0].data.length ? (
+            {user.categories.length ? (
                 <div>
                     <div>
                         <p>Category: {selectedCategory}</p>
