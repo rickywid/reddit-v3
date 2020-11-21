@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Formik, Field, Form, ErrorMessage, FieldArray } from 'formik';
 import UserContext from '../context/userContext';
 import SubredditListItem from './subredditListItem';
@@ -32,15 +32,12 @@ const Settings = () => {
     const { user, setUser } = useContext(UserContext);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<{ type: string, msg: string } | null>(null);
-
     const request = new Fetch();
-    console.log(user);
 
     const handleOnDeleteSubreddit = async (subredditName: string, categoryName: string) => {
-
         setIsSubmitting(true);
         let subreddits = user.categories
-            .filter((c: ICategories) => c.name === categoryName)[0].subreddits
+            .filter((c: ICategories) => c.category_name === categoryName)[0].data
             .filter((subreddit: string) => subreddit !== subredditName)
 
         /**
@@ -76,6 +73,7 @@ const Settings = () => {
                 const req = await Promise.all(subreddits.map((s: { name: string }) => {
                     return fetch(`https://www.reddit.com/r/${s.name}.json`);
                 })).catch(e => {
+                    console.log(e)
                     throw new Error('Invalid Subreddit');
                 });
 
@@ -89,10 +87,12 @@ const Settings = () => {
                 }
 
             } catch (e) {
+                console.log(e)
                 setError({ type: 'subreddit', msg: e.message });
                 return;
             }
         } catch (e) {
+            console.log(e)
             setError({ type: 'subreddit', msg: e.message });
             return;
         }
@@ -117,8 +117,8 @@ const Settings = () => {
 
         const res = await Promise.all(arr.map((v: { category: string; names: string[] }) => {
             const categoryName = v.category;
-            const subreddits = user.categories.filter((c: { name: string }) => c.name === categoryName)[0].subreddits;
-
+            const subreddits = user.categories.filter((c: { category_name: string }) => {
+                return c.category_name === categoryName})[0].data;
             const data = {
                 category: categoryName,
                 subreddits: [...subreddits, ...v.names]
@@ -126,7 +126,7 @@ const Settings = () => {
 
             return request.updateSubreddit(data);
         }));
-
+    
         user.categories = res;
         const userState = user;
         userState['categories'] = res[0];
@@ -149,7 +149,7 @@ const Settings = () => {
                 setIsSubmitting(true);
                 user.categories = res;
                 userState = user;
-                userState['categories'] = res[0];
+                userState['categories'] = res[res.length-1];
             } catch (e) {
                 throw new Error('Network error. Try again later.')
             }
@@ -169,10 +169,10 @@ const Settings = () => {
 
         // get the subreddits for prevCategory and newCategory
         let prev = user.categories
-            .filter((c: ICategories) => c.name === prevCategory)[0].subreddits;
+            .filter((c: ICategories) => c.category_name === prevCategory)[0].data;
 
         let next = user.categories
-            .filter((c: ICategories) => c.name === newCategory)[0].subreddits;
+            .filter((c: ICategories) => c.category_name === newCategory)[0].data;
 
         // remove subreddit from prevCategory array & insert subreddit into newCategory
         prev = prev.filter((s: string) => s !== subreddit);
@@ -198,6 +198,7 @@ const Settings = () => {
         try {
             validateCategory({ categories: [{ name: category }] }, user.categories);
         } catch (e) {
+            console.log(e)
             setError({ type: 'category', msg: e.message });
             return;
         }
@@ -227,7 +228,7 @@ const Settings = () => {
 
     const getCategorySubreddits = (category: string) => {
         return user.categories
-            .filter((c: ICategories) => c.name === category)[0].subreddits;
+            .filter((c: ICategories) => c.category_name === category)[0].data;
     }
 
     return isSubmitting ? <div>saving</div> : (
@@ -235,13 +236,13 @@ const Settings = () => {
             <h3>Categories</h3>
             <p>List all user's categories</p>
             <ul>
-                {user.categories.map((category: { category_id: number, name: string, subreddits: [] }, index: number) => {
-                    const { name, category_id } = category;
+                {user.categories.map((category: { category_id: number, category_name: string, subreddits: [] }, index: number) => {
+                    const { category_name, category_id } = category;
                     return (
                         <CategoryListItem
-                            key={`${name}-${index}`}
+                            key={`${category_name}-${index}`}
                             id={category_id}
-                            name={name}
+                            name={category_name}
                             renameCategory={renameCategory}
                             deleteCategory={deleteCategory}
                         />
@@ -307,16 +308,16 @@ const Settings = () => {
             <h3>Subreddits</h3>
             <p>List all user's subreddits along with it's category</p>
             <ul>
-                {user.categories.map((category: { category_id: number, name: string, subreddits: [] }, index: number) => {
-                    const { name, subreddits } = category;
+                {user.categories.map((category: { category_id: number, category_name: string, data: [] }, index: number) => {
+                    const { category_name, data } = category;
                     return (
-                        <div key={`${name}-${index}`}>
-                            <p>{name} {subreddits.length}</p>
-                            {subreddits.map((subreddit: string, index: number) => {
+                        <div key={`${category_name}-${index}`}>
+                            <p>{category_name} {data.length}</p>
+                            {data.map((subreddit: string, index: number) => {
                                 return (
                                     <SubredditListItem
                                         categories={user.categories}
-                                        category={category.name}
+                                        category={category.category_name}
                                         subredditName={subreddit}
                                         key={`${subreddit}-${index}`}
                                         deleteSub={handleOnDeleteSubreddit}
@@ -363,8 +364,8 @@ const Settings = () => {
                                                         as="select"
                                                     >
                                                         <option value="">Select</option>
-                                                        {user.categories.map((category: { name: string }, i: number) => {
-                                                            return <option key={`${i}-${category}`} value={category.name}>{category.name}</option>
+                                                        {user.categories.map((category: { category_name: string }, i: number) => {
+                                                            return <option key={`${i}-${category.category_name}`} value={category.category_name}>{category.category_name}</option>
                                                         })}
 
                                                     </Field>

@@ -1,5 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
-import UserContext from '../context/userContext';
+import React, { useState, useRef } from 'react';
 
 interface IProps {
     id: number;
@@ -9,7 +8,6 @@ interface IProps {
 }
 
 const CategoryListItem = ({ id, name, renameCategory, deleteCategory }: IProps) => {
-    const { user, setUser } = useContext(UserContext);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null)
 

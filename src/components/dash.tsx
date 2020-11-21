@@ -1,13 +1,12 @@
 import React, { useEffect, useContext, useState } from 'react';
 import UserContext from '../context/userContext';
-import Fetch from '../lib/fetch';
 import GetStartedForm from './getStartedForm';
 
 
 // Todo: Clean up interfaces
 export interface ICategories {
-    name: string;
-    subreddits: string[];
+    category_name: string;
+    data: string[];
 }
 
 interface IResponseData {
@@ -45,19 +44,11 @@ const User = () => {
         const fetch = async () => {
             const req: ISubreddits[] = await fetchSubs();
             setSubs(req);
-            console.log(subreddits)
             setIsLoading(false);
         }
 
         fetch();
     }, [selectedCategory, formSubmitting]);
-
-    const logout = async () => {
-        const fetch = new Fetch();
-        localStorage.removeItem('userId');
-        await fetch.logout('/auth/logout');
-        setUser(null);
-    }
 
     const changeCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { value } = e.target;
@@ -89,7 +80,7 @@ const User = () => {
             const data: [IResponseData][] = await Promise.all(categories.map(async (category: ICategories) => {
 
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
-                const subreddits = category.subreddits.length ? category.subreddits : intialSubreddits;
+                const subreddits = category.data.length ? category.data : intialSubreddits;
                 const res = await Promise.all(subreddits.map(subreddit => (
                     fetch(`https://www.reddit.com/r/${subreddit}.json`))));
                 const req = await Promise.all(res.map(r => r.json()));
@@ -100,8 +91,11 @@ const User = () => {
 
         } else {
             const category = categories
-                .map((category: ICategories): string[] => category.name === selectedCategory ? category.subreddits : [])
+                .map((category: ICategories): string[] => category.category_name === selectedCategory ? category.data : [])
                 .filter((c: string[]) => c.length > 0);
+
+            if (!category.length) { return []; }
+
             const res = await Promise.all(category[0].map((subreddit: string) => (
                 fetch(`https://www.reddit.com/r/${subreddit}.json`))));
             const data = await Promise.all(res.map((r: any) => r.json()));
@@ -123,7 +117,7 @@ const User = () => {
                 /**
                  *  When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                  */
-                const subreddits = category.subreddits.length ? category.subreddits : intialSubreddits;
+                const subreddits = category.data.length ? category.data : intialSubreddits;
                 const data = subreddits.map((s: string, j: number) => {
                     const data: any = x[i][j];
 
@@ -163,21 +157,38 @@ const User = () => {
                         <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory}>
                             <option value="All">All</option>
                             {user.categories.map((category: ICategories, i: number) => {
-                                return <option key={`${i}-${category}`} value={category.name}>{category.name}</option>
+                                return <option key={`${i}-${category}`} value={category.category_name}>{category.category_name}</option>
                             })}
                         </select>
-                        {user.categories.map((category: ICategories, i: number) => {
+                        {selectedCategory === 'All' ? user.categories.map((category: ICategories, i: number) => {
                             return (
                                 <div key={`${i}-${category}`}>
-                                    <h3>{category.name}</h3>
+                                    <h3>{category.category_name}</h3>
                                     <ul>
-                                        {category.subreddits.map((data: string, i: number) => {
+                                        {category.data.map((data: string, i: number) => {
                                             return <li key={`${i}-${data}`}>{data}</li>
                                         })}
                                     </ul>
                                 </div>
                             )
-                        })}
+                        }) :
+                            user.categories.map((category: ICategories, i: number) => {
+                                if (category.category_name === selectedCategory) {
+                                    return (
+                                        <div key={`${i}-${category}`}>
+                                            <h3>{category.category_name}</h3>
+                                            <ul>
+                                                {category.data.map((data: string, i: number) => {
+                                                    return <li key={`${i}-${data}`}>{data}</li>
+                                                })}
+                                            </ul>
+                                        </div>
+                                    )
+                                }
+
+                                return <div></div>
+                            })
+                        }
                     </div>
 
 
@@ -210,7 +221,7 @@ const User = () => {
                     {selectedCategory !== 'All' && (
                         <div>
 
-                            {
+                            {subreddits.length ?
                                 subreddits.map((d: any, i: number) => {
                                     return <li key={`${d.subreddit_name}-${i}`}>
                                         <p>{d.subreddit_name}</p>
@@ -219,15 +230,13 @@ const User = () => {
                                         </ul>
                                     </li>
                                 })
-                            }
+                                : <p>No Subreddits</p>}
 
                         </div>
                     )}
                 </div>
             ) : (
                     <div>
-                        <button onClick={logout}>logout</button>
-
                         <h2>Start Adding Your Favourite Subreddits</h2>
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima, eveniet soluta, praesentium ea ut repudiandae, perspiciatis neque corrupti perferendis!</p>
 

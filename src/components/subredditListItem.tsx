@@ -1,5 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
-import UserContext from '../context/userContext';
+import React, { useState, useRef } from 'react';
 import { ICategories } from './dash';
 
 interface IProps {
@@ -11,7 +10,6 @@ interface IProps {
 }
 
 const SubredditListItem = ({ categories, category, subredditName, deleteSub, saveCategory }: IProps) => {
-    const { user, setUser } = useContext(UserContext);
     const [ selectedCategory, setSelectedCategory ] = useState<string>(category)
     const selectEl = useRef<HTMLSelectElement>(null);
 
@@ -31,9 +29,8 @@ const SubredditListItem = ({ categories, category, subredditName, deleteSub, sav
         <li>
             <span>{subredditName}</span>
             <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory} ref={selectEl}>
-                <option value="All">All</option>
                 {categories.map((category: any, i: number) => {
-                    return <option key={`${i}-${category}`} value={category.name}>{category.name}</option>
+                    return <option key={`${i}-${category.category_name}`} value={category.category_name}>{category.category_name}</option>
                 })}
             </select>
             <button onClick={handleOnDelete}>delete</button>
