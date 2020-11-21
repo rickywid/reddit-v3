@@ -35,8 +35,8 @@ export interface IGetStartedData {
 const User = () => {
     const { user, setUser } = useContext(UserContext);
     const [selectedCategory, setCategory] = useState<string>('All');            // Selected Category value
-    const [intialSubreddits, setInitialSubreddits] = useState<string[]>([]);    // State will be initialized if user has no subreddits
-    const [subreddits, setSubs] = useState<ISubreddits[]>([]);                  // State will be initialized if the user is already following subreddits
+    const [intialSubreddits, setInitialSubreddits] = useState<string[]>([]);    // State will be instantiated if user has no subreddits
+    const [subreddits, setSubs] = useState<ISubreddits[]>([]);                  // State will be instantiated after fetchSubs() is ran
     const [isLoading, setIsLoading] = useState<boolean>(true);                  // Check if fetch requests has completed
     const [formSubmitting, setFormSubmitting] = useState<boolean>(false);       // Check if the form is currently being submitted when <GetStartedForm /> component is mounted
 
@@ -63,7 +63,13 @@ const User = () => {
      * @param values 
      */
     const formSubmit = (values: IGetStartedData) => {
-        setInitialSubreddits(values.subreddits.map((s: { name: string }) => s.name));
+        const data = values.subreddits.map((s: { name: string }) => s.name);
+        setInitialSubreddits(data);
+
+        // Update the user's Uncategorized array
+        const userState = user;
+        userState['categories'][0].data = data;
+        setUser(userState);
         setFormSubmitting(true);
     }
 
@@ -153,7 +159,7 @@ const User = () => {
      * Show the GetStartedComponent if true
      */
     const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
-
+    
     return isLoading ? <div>loading</div> : (
         <div>
             {isSubredditsEmpty.length > 0 ? (
