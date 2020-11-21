@@ -9,7 +9,7 @@ const Routes = (
     <Switch>
         <Route exact path="/" component={Root} />
         <Route path="/dash" component={Dash} />
-        <Route path="/settings" component={Settings} />
+        <Route exact path="/settings" component={Settings} />
         <Route path="/redirect" component={({location, history}:any) => <Redirect location={location} history={history} />} />
     </Switch>
 )

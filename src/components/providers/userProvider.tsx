@@ -13,33 +13,26 @@ export interface IUser {
 }
 
 const UserProvider = ({ children }: any) => {
-    const [user, setUser] = useState<IUser>({
-        id: null,
-        picture: '',
-        username: '',
-        categories: [
-            {
-                name: '',
-                subreddits: []
-            }
-        ]
-    });
+    const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
     const userId = localStorage.getItem('userId') || '';
 
     useEffect(() => {
+        
         const fetch = new Fetch();
         const request = async () => {
             try {
-                const user: IUser = await fetch.getUser(userId);
+                // const user: IUser = await fetch.getUser(userId);
+                const user: IUser = await fetch.getUser();
+                console.log(user)
                 setUser(user);
                 setLoading(false);
             } catch (e) {
                 console.log(e)
             }
         }
-
-        if (user || userId) { request() };
+        request();
+        // if (user || userId) { request() } else { setLoading(false)};
 
     }, []);
 

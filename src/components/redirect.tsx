@@ -14,7 +14,7 @@ const Redirect = ({location, history}:Props) => {
         const userId:string = urlParams.get('id') || '';
         localStorage.setItem('userId', userId);
         
-        history.push('/');
+        window.location.replace('http://localhost:3000')
     });
 
     return (

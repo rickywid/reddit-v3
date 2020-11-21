@@ -19,9 +19,14 @@ class Fetch {
         this.request(url, this.options)
     }
 
-    getUser(id:string) {
+    // getUser(id:string) {
+    //     this.options['method'] = 'GET';
+    //     return this.request(`/user/${id}`, this.options)
+    // }
+
+    getUser() {
         this.options['method'] = 'GET';
-        return this.request(`/user/${id}`, this.options)
+        return this.request(`/user`, this.options)
     }
 
     // Todo: Rename function to "updateCategories"
@@ -57,6 +62,10 @@ class Fetch {
 
     async request(url:string, headers:{}) {
         return await fetch(`${this.domain}${url}`, headers).then((res:Response) => {
+            if(res.ok === false) {
+                return null;
+            }
+            
             return res.json();
         });
     }

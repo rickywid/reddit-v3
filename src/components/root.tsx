@@ -5,9 +5,10 @@ import UserContext from '../context/userContext';
 
 const Root = () => {
     const {user, setUser} = useContext(UserContext);
+    console.log(user)
     return (
         <div>
-            {!user.id ? <Landing /> : <Dash />}
+            {!user ? <Landing /> : <Dash />}
         </div>
     )
 }
