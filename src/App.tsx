@@ -20,12 +20,16 @@ function App() {
     console.log(user);
     return (
         <div className="App">
-            {user && <div>
-                <p>{user.username}</p>
-                <Link to={'/settings'}>Settings</Link>
-                <button onClick={logout}>logout</button>
-            </div>}
-            <Link to={'/'}>Home</Link>
+            <nav>
+                <ul>
+                    <li><Link to={'/'}>Home</Link></li>
+                    {user && <div className="auth-links">
+                        <li>{user.username}</li>
+                        <li><Link to={'/settings'}>Settings</Link></li>
+                        <li><button onClick={logout}>logout</button></li>
+                    </div>}
+                </ul>
+            </nav>
             {Routes}
         </div>
     );

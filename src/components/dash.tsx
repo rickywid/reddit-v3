@@ -128,7 +128,7 @@ const User = () => {
                 });
 
                 return {
-                    category_name: category.name,
+                    category_name: category.category_name,
                     data
                 }
             })
@@ -148,11 +148,17 @@ const User = () => {
         return arr;
     }
 
+    /**
+     * Check if all of the user's categories are empty - (user is not following any subreddits)
+     * Show the GetStartedComponent if true
+     */
+    const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
+
     return isLoading ? <div>loading</div> : (
         <div>
-            {user.categories.length ? (
-                <div>
-                    <div>
+            {isSubredditsEmpty.length > 0 ? (
+                <div className="container">
+                    <div className="category-col">
                         <p>Category: {selectedCategory}</p>
                         <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory}>
                             <option value="All">All</option>
@@ -163,10 +169,10 @@ const User = () => {
                         {selectedCategory === 'All' ? user.categories.map((category: ICategories, i: number) => {
                             return (
                                 <div key={`${i}-${category}`}>
-                                    <h3>{category.category_name}</h3>
+                                    <h3><a href={`#${category.category_name}`}>{category.category_name}</a></h3>
                                     <ul>
                                         {category.data.map((data: string, i: number) => {
-                                            return <li key={`${i}-${data}`}>{data}</li>
+                                            return <li key={`${i}-${data}`}><a href={`#${data}`}>{data}</a></li>
                                         })}
                                     </ul>
                                 </div>
@@ -199,14 +205,14 @@ const User = () => {
                             {subreddits.map((subreddit: ISubreddits, i: number) => {
                                 return (
                                     <div key={`${subreddit.category_name}-${i}`}>
-                                        <h3>{subreddit.category_name}</h3>
+                                        <h3 id={subreddit.category_name}>{subreddit.category_name}</h3>
                                         {subreddit.data.map((d: any) => {
-                                            return <li key={`${d.subreddit_name}-${i}`}>
-                                                <span>{d.subreddit_name}</span>
+                                            return <div key={`${d.subreddit_name}-${i}`}>
+                                                <h4 id={d.subreddit_name}>{d.subreddit_name}</h4>
                                                 <ul>
                                                     {d.data.map((s: { data: { title: string } }) => <li key={`${s.data.title}-${i}`}>{s.data.title}</li>)}
                                                 </ul>
-                                            </li>
+                                            </div>
                                         })}
 
                                     </div>
@@ -223,12 +229,12 @@ const User = () => {
 
                             {subreddits.length ?
                                 subreddits.map((d: any, i: number) => {
-                                    return <li key={`${d.subreddit_name}-${i}`}>
-                                        <p>{d.subreddit_name}</p>
+                                    return <div key={`${d.subreddit_name}-${i}`}>
+                                        <h4>{d.subreddit_name}</h4>
                                         <ul>
                                             {d.data.map((s: { data: { title: string } }) => <li key={`${s.data.title}-${i}`}>{s.data.title}</li>)}
                                         </ul>
-                                    </li>
+                                    </div>
                                 })
                                 : <p>No Subreddits</p>}
 
