@@ -42,7 +42,13 @@ const User = () => {
 
     useEffect(() => {
         const fetch = async () => {
-            const req: ISubreddits[] = await fetchSubs();
+            let req: ISubreddits[];;
+            if (formSubmitting) {
+                req = await fetchSubsInitial();
+            } else {
+                req = await fetchSubs();
+            }
+
             setSubs(req);
             setIsLoading(false);
         }
@@ -73,6 +79,23 @@ const User = () => {
         setFormSubmitting(true);
     }
 
+    const fetchSubsInitial = async () => {
+        const data: [IResponseData][] = await Promise.all(user.categories.map(async (category: ICategories) => {
+            if (category.category_name === 'uncategorized') {
+                // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
+                // const subreddits = category.data.length ? category.data : ;
+                const res = await Promise.all(category.data.map(subreddit => (
+                    fetch(`https://www.reddit.com/r/${subreddit}.json`))));
+                const req = await Promise.all(res.map(r => r.json()));
+                return req;
+            } else {
+                return [];
+            }
+        }));
+
+        return build(data, user.categories);
+    }
+
     /**
      * fetchSubs() will make a request to fetch the subreddit(s) data
      */
@@ -92,7 +115,7 @@ const User = () => {
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             }));
-
+            
             return build(data, categories);
 
         } else {
@@ -115,7 +138,7 @@ const User = () => {
      */
     const build = (x: any, categories?: any) => {
         let arr: any[] = [];
-
+        
         if (categories) {
             // loop through categories
             arr = categories.map((category: any, i: number) => {
@@ -123,10 +146,11 @@ const User = () => {
                 /**
                  *  When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                  */
-                const subreddits = category.data.length ? category.data : intialSubreddits;
+                
+                // const subreddits = category.data.length ? category.data : intialSubreddits;
+                const subreddits = category.data;
                 const data = subreddits.map((s: string, j: number) => {
                     const data: any = x[i][j];
-
                     return {
                         subreddit_name: s,
                         data: data.data.children
@@ -159,7 +183,7 @@ const User = () => {
      * Show the GetStartedComponent if true
      */
     const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
-    
+
     return isLoading ? <div>loading</div> : (
         <div>
             {isSubredditsEmpty.length > 0 ? (
