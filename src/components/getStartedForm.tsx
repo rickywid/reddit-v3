@@ -35,8 +35,8 @@ const GetStartedForm = ({ formSubmit }: IProps) => {
 
     const handleSubmit = (async (values: IFormData) => {
         try {
-            // const data = values.subreddits.map((s: { name: string }) => s.name);
-            // validateCategorySubmit(data);
+            const data = values.subreddits.map((s: { name: string }) => s.name);
+            validateCategorySubmit(data);
             await request.updateSubreddits(values);
             formSubmit(values);
         } catch (e) {
@@ -61,11 +61,10 @@ const GetStartedForm = ({ formSubmit }: IProps) => {
                                     {values.subreddits.length > 0 &&
                                         values.subreddits.map((friend, index) => (
                                             <div className="settings-item" key={index}>
-                                                <label htmlFor={`subreddits.${index}.name`}>Subreddit</label>
+                                                <label htmlFor={`subreddits.${index}.name`}>r/</label>
                                                 <div className="settings-item-buttons">
                                                     <Field
                                                         name={`subreddits.${index}.name`}
-                                                        placeholder="Jane Doe"
                                                         type="text"
                                                         required
                                                     />
@@ -83,12 +82,13 @@ const GetStartedForm = ({ formSubmit }: IProps) => {
                                         onClick={() => push({ name: '' })}
                                         style={{ marginBottom: '10px' }}
                                     >
-                                        Add Subreddit
+                                        Add
                                     </button>
                                 </div>
                             )}
                         </FieldArray>
-                        <button type="submit" disabled={values.subreddits.length ? false : true}>Submit</button>
+                        <hr/>
+                        <button type="submit" disabled={values.subreddits.length ? false : true} className="sub-submit-btn">Submit</button>
                         {error && <p style={{ color: 'red' }}>{error}</p>}
                     </Form>
                 )}

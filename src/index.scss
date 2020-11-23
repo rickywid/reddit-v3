@@ -1,21 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,300&display=swap');
 
 body {
-    padding: 30px 0;
+    padding: 30px;
     max-width: 1100px;
     margin: 0 auto;
     color: black;
     font-family: 'Open Sans', sans-serif;
 }
 
+h3 {
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 5px 10px;
+    background: red;
+    color: white;
+}
+
+h4 {
+    border-bottom: 3px solid #0072ff;
+    width: 30%;
+}
+
 a {
-    color: #545454;
+    color: black;
     text-decoration: none;
 
-    &:hover,
-    &:active,
-    &:visited {
-        color: initial;
+    &:hover {
+        color: #0072ff;
+    }
+    &:active{
+        color: black;
     }
 }
 
@@ -40,12 +54,27 @@ select, button {
     }
 }
 
+
 button {
     width: 150px;
 }
 button:hover {
     background: #0072ff;
     color: white;
+}
+
+button.sub-save-btn {
+    background: #0072ff;
+    color: white;
+}
+button:disabled {
+    border: 3px solid #396497;
+    background: #ececec;
+    color: grey;
+
+    &:hover {
+        color: grey;
+    }
 }
 
 hr {
@@ -55,20 +84,74 @@ section {
     margin-bottom: 100px;
 }
 
+input {
+    border: 3px solid black;
+}
+
 nav {
     margin: 0;
     text-align: right;
+    font-size: 12px;
+
     ul {
         li, 
         .auth-links {
             margin-right: 10px;
             display: inline-block;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            a {
+                color:#8b8b8b;
+                &:hover {
+                    color: #0072ff;
+                }
+            }
         }
     } 
 }
 
+.visit-reddit {
+    background: #FF4500;
+    color: white;
+    width: 150px;
+    display: inline-block;
+    border: 3px solid #FF4500;
+    text-align: center;
+    font-weight: bold;
+    padding: 5px 0;
+    font-size: 13.333px;
+
+    &:hover {
+        background: #FF4500;
+        color: white;
+    }
+}
+
+.sticky {
+    font-weight: bold;
+    color: #0072ff;
+}
+
 .container {
     display: flex;
+
+    .comments,
+    .created {
+        color: #6f8ea3;
+        margin-right: 10px;
+    }
+
+    .category-subreddit-item {
+        color:#8b8b8b;
+        font-size: 12px;
+
+        &:hover {
+            color: #0072ff;
+        }
+    }
 }
 
 .category-col {
@@ -81,6 +164,13 @@ nav {
         display: flex;
         justify-content: space-between;
         margin: 10px 0;
+
+        .category-edit {
+            display: flex;
+            width: 247px;
+            margin-right: 20px;
+        }
+
         label, input, span {
             flex: 1;
             // align-self: center;;
@@ -92,8 +182,9 @@ nav {
 
         .settings-item-buttons {
             flex: 2;
-            justify-content: space-around;
+            justify-content: space-between;
             display: flex;
+            flex-wrap: wrap;
 
             input {
                 flex: 0.45;
@@ -101,3 +192,107 @@ nav {
         }
     }
 }
+
+.sub-submit-btn {
+    border: #0072ff;
+    background: #0072ff;
+    color: white;
+    padding: 10px 0;
+
+    &:hover {
+        background:#0052b6;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    nav {
+        margin-bottom: 50px;
+    }
+
+    .container {
+        display: initial;
+
+        .category-col {
+            margin-right: auto;
+
+            select {
+                width: 100%;
+            }
+
+            aside {
+                display: none;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 600px) {
+
+    body {
+        padding: 20px;
+    }
+
+    input {
+        width: 100%;
+        display: block;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    label {
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .wrap {
+            width: auto;
+
+        .settings-item {
+            display: block;
+
+            button {
+                flex: 1;
+            }
+
+            span {
+                display: inline-block;
+                margin-bottom: 10px;
+            }
+
+            .category-edit {
+                width: 100%;
+
+                input {
+                    padding: 5px 0;
+                    margin-bottom: 10px;
+                }
+            }
+    
+            .settings-item-buttons {
+                display: flex;
+
+                input {
+                    flex: auto;
+                    margin-bottom: 10px;
+                    padding: 5px 0;
+                }
+
+                .sub-save-btn,
+                .sub-remove-btn {
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    @media only screen and (max-width: 380px) { 
+        .settings-item-buttons {
+            .sub-save-btn {
+                margin-top: 10px;
+            }
+        }
+    }
+}
+  

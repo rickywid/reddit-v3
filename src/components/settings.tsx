@@ -242,15 +242,16 @@ const Settings = () => {
     return isSubmitting ? <div>saving</div> : (
         <div className="wrap">
             <section>
-                <h3>Categories</h3>
+                <h4>Categories</h4>
                 <ul>
-                    {user.categories.map((category: { category_id: number, category_name: string, subreddits: [] }, index: number) => {
+                    {user.categories.map((category: { category_id: number, category_name: string, data: [] }, index: number) => {
                         const { category_name, category_id } = category;
                         return (
                             <CategoryListItem
                                 key={`${category_name}-${index}`}
                                 id={category_id}
                                 name={category_name}
+                                count={category.data.length}
                                 renameCategory={renameCategory}
                                 deleteCategory={deleteCategory}
                             />
@@ -300,25 +301,26 @@ const Settings = () => {
                                             onClick={() => push({ name: '' })}
                                             style={{ marginBottom: '10px' }}
                                         >
-                                            Add Category
+                                            Add
                 </button>
                                     </div>
                                 )}
                             </FieldArray>
-                            <button type="submit" disabled={values.categories.length ? false : true}>Submit</button>
+                            <hr/>
+                            <button type="submit" disabled={values.categories.length ? false : true} className="sub-submit-btn">Submit</button>
                             {error && error.type === "category" && <p style={{ color: 'red' }}>{error.msg}</p>}
                         </Form>
                     )}
                 </Formik>
             </section>
             <section>
-                <h3>Subreddits</h3>
+                <h4>Subreddits</h4>
                 <ul>
                     {user.categories.map((category: { category_id: number, category_name: string, data: [] }, index: number) => {
                         const { category_name, data } = category;
                         return (
                             <div key={`${category_name}-${index}`}>
-                                <p><strong>{category_name} {data.length}</strong></p>
+                                <p><strong>{category_name}</strong></p>
                                 {data.map((subreddit: string, index: number) => {
                                     return (
                                         <SubredditListItem
@@ -354,7 +356,6 @@ const Settings = () => {
                                                     <div className="settings-item-buttons">
                                                         <Field
                                                             name={`subreddits.${index}.name`}
-                                                            placeholder="Jane Doe"
                                                             type="text"
                                                             required
                                                         />
@@ -375,7 +376,7 @@ const Settings = () => {
                                                         </Field>
                                                         <button
                                                             type="button"
-                                                            className="secondary"
+                                                            className="sub-remove-btn"
                                                             onClick={() => remove(index)}
                                                         >
                                                             Remove
@@ -389,12 +390,13 @@ const Settings = () => {
                                             onClick={() => push({ name: '' })}
                                             style={{ marginBottom: '10px' }}
                                         >
-                                            Add Subreddit
+                                            Add
                 </button>
                                     </div>
                                 )}
                             </FieldArray>
-                            <button type="submit" disabled={values.subreddits.length ? false : true}>Submit</button>
+                            <hr/>
+                            <button type="submit" disabled={values.subreddits.length ? false : true} className="sub-submit-btn">Submit</button>
                             {error && error.type === "subreddit" && <p style={{ color: 'red' }}>{error.msg}</p>}
                         </Form>
                     )}

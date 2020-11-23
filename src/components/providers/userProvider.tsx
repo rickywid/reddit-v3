@@ -15,7 +15,6 @@ export interface IUser {
 const UserProvider = ({ children }: any) => {
     const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
-    const userId = localStorage.getItem('userId') || '';
 
     useEffect(() => {
         

@@ -22,8 +22,8 @@ function App() {
         <div className="App">
             <nav>
                 <ul>
-                    <li><Link to={'/'}>Home</Link></li>
                     {user && <div className="auth-links">
+                        <li><Link to={'/'}>Home</Link></li>
                         <li><Link to={'/settings'}>{user.username}</Link></li>
                         <li><button onClick={logout}>logout</button></li>
                     </div>}

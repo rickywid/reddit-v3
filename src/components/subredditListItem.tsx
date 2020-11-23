@@ -35,7 +35,7 @@ const SubredditListItem = ({ categories, category, subredditName, deleteSub, sav
                         })}
                     </select>
                     <button onClick={handleOnDelete}>Remove</button>
-                    <button onClick={handleOnSave} disabled={selectedCategory === category}>Save</button>
+                    <button onClick={handleOnSave} disabled={selectedCategory === category} className={`${selectedCategory !== category ? 'sub-save-btn' : ''}`}>Save</button>
                 </div>
         </li>
     )

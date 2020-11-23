@@ -3,11 +3,12 @@ import React, { useState, useRef } from 'react';
 interface IProps {
     id: number;
     name: string;
+    count: number;
     renameCategory: Function;
     deleteCategory: Function;
 }
 
-const CategoryListItem = ({ id, name, renameCategory, deleteCategory }: IProps) => {
+const CategoryListItem = ({ id, name, renameCategory, deleteCategory, count }: IProps) => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null)
 
@@ -33,11 +34,7 @@ const CategoryListItem = ({ id, name, renameCategory, deleteCategory }: IProps) 
                 </div>
             ) : (
                     <div className="settings-item">
-                        <div style={{
-                            display: 'flex',
-                            width: '247px',
-                            marginRight: '20px'
-                        }}>
+                        <div className="category-edit">
                             <input type="text" ref={inputRef} defaultValue={name} />
                         </div>
 
@@ -53,11 +50,11 @@ const CategoryListItem = ({ id, name, renameCategory, deleteCategory }: IProps) 
             <li key={`${name}`}>
                 {name === 'uncategorized' ? (
                     <div>
-                        <p>{name}</p>
+                        <p>{name} <small>{count}</small></p>
                     </div>
                 ) : (
                         <div className="settings-item">
-                            <span>{name}</span>
+                            <span>{name} <small>{count}</small></span>
                             <div className="settings-item-buttons">
                                 <button onClick={handleOnEdit}>Edit</button>
                                 <button onClick={handleOnDelete}>Remove</button>

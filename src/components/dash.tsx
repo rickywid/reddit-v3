@@ -1,7 +1,8 @@
 import React, { useEffect, useContext, useState } from 'react';
 import UserContext from '../context/userContext';
 import GetStartedForm from './getStartedForm';
-
+import { MessageTwoTone, LoadingOutlined, RedditOutlined } from '@ant-design/icons';
+import moment from 'moment';
 
 // Todo: Clean up interfaces
 export interface ICategories {
@@ -34,7 +35,7 @@ export interface IGetStartedData {
 
 const User = () => {
     const { user, setUser } = useContext(UserContext);
-    const [selectedCategory, setCategory] = useState<string>('All');            // Selected Category value
+    const [selectedCategory, setCategory] = useState<string>(localStorage.getItem('selectedCategory') || 'All');            // Selected Category value
     const [intialSubreddits, setInitialSubreddits] = useState<string[]>([]);    // State will be instantiated if user has no subreddits
     const [subreddits, setSubs] = useState<ISubreddits[]>([]);                  // State will be instantiated after fetchSubs() is ran
     const [isLoading, setIsLoading] = useState<boolean>(true);                  // Check if fetch requests has completed
@@ -44,7 +45,6 @@ const User = () => {
         const fetch = async () => {
             let req: ISubreddits[];;
             if (formSubmitting) {
-                console.log(user.categories)
                 req = await fetchSubsInitial();
             } else {
                 req = await fetchSubs();
@@ -60,6 +60,7 @@ const User = () => {
     const changeCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { value } = e.target;
         setIsLoading(true);
+        localStorage.setItem('selectedCategory', value);
         setCategory(value);
     }
 
@@ -81,7 +82,6 @@ const User = () => {
     }
 
     const fetchSubsInitial = async () => {
-        console.log(user.categories)
         const data: [IResponseData][] = await Promise.all(user.categories.map(async (category: ICategories) => {
             if (category.category_name === 'uncategorized') {
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
@@ -94,7 +94,6 @@ const User = () => {
                 return [];
             }
         }));
-        console.log(data)
         return build(data, user.categories);
     }
 
@@ -117,7 +116,6 @@ const User = () => {
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             }));
-            console.log(data);
             return build(data, categories);
 
         } else {
@@ -130,7 +128,6 @@ const User = () => {
             const res = await Promise.all(category[0].map((subreddit: string) => (
                 fetch(`https://www.reddit.com/r/${subreddit}.json`))));
             const data = await Promise.all(res.map((r: any) => r.json()));
-            console.log(data);
             return build(data);
         }
     }
@@ -139,7 +136,6 @@ const User = () => {
      * Build the data structure
      */
     const build = (x: any, categories?: any) => {
-        console.log(x)
         let arr: any[] = [];
 
         if (categories) {
@@ -185,48 +181,52 @@ const User = () => {
      */
     const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
 
-    return isLoading ? <div>loading</div> : (
+    return isLoading ? <div><LoadingOutlined /></div> : (
         <div>
             {isSubredditsEmpty.length > 0 ? (
                 <div className="container">
                     <div className="category-col">
-                        <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory}>
+                        <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory} style={{ margin: '20px 0' }}>
                             <option value="All">All</option>
                             {user.categories.map((category: ICategories, i: number) => {
                                 return <option key={`${i}-${category}`} value={category.category_name}>{category.category_name}</option>
                             })}
                         </select>
-                        {selectedCategory === 'All' ? user.categories.map((category: ICategories, i: number) => {
-                            return (
-                                <div key={`${i}-${category}`}>
-                                    <h3><a href={`#${category.category_name}`}>{category.category_name}</a></h3>
-                                    {category.data.length ? (
-                                        <ul>
-                                            {category.data.map((data: string, i: number) => {
-                                                return <li key={`${i}-${data}`}><a href={`#${data}`}>{data}</a></li>
-                                            })}
-                                        </ul>
-                                    ) : <p>(none)</p>}
-                                </div>
-                            )
-                        }) :
-                            user.categories.map((category: ICategories, i: number) => {
-                                if (category.category_name === selectedCategory) {
-                                    return (
-                                        <div key={`${i}-${category}`}>
-                                            <h3>{category.category_name}</h3>
+                        <aside>
+                            {selectedCategory === 'All' ? user.categories.map((category: ICategories, i: number) => {
+                                return (
+                                    <div key={`${i}-${category}`}>
+                                        <h5><a href={`#${category.category_name}`}>{category.category_name}</a></h5>
+                                        {category.data.length ? (
                                             <ul>
                                                 {category.data.map((data: string, i: number) => {
-                                                    return <li key={`${i}-${data}`}>{data}</li>
+                                                    return <li key={`${i}-${data}`}><a href={`#${data}`} className="category-subreddit-item">{data}</a></li>
                                                 })}
                                             </ul>
-                                        </div>
-                                    )
-                                }
+                                        ) : <p>(none)</p>}
+                                    </div>
+                                )
+                            }) :
+                                user.categories.map((category: ICategories, i: number) => {
+                                    if (category.category_name === selectedCategory) {
+                                        return (
+                                            <div key={`${i}-${category}`}>
+                                                <ul>
+                                                    {category.data.map((data: string, i: number) => {
+                                                        return <li key={`${i}-${data}`}><a href={`#${data}`} className="category-subreddit-item">{data}</a></li>
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        )
+                                    }
 
-                                return <div></div>
-                            })
-                        }
+                                    return <div></div>
+                                })
+                            }
+                            <ul style={{marginTop: '50px'}}>
+                                <li><a href="https://reddit.com" className="visit-reddit"><RedditOutlined style={{marginRight: '10px'}} />Visit Reddit</a></li>
+                            </ul>
+                        </aside>
                     </div>
 
 
@@ -236,16 +236,25 @@ const User = () => {
                         <div>
                             {subreddits.map((subreddit: ISubreddits, i: number) => {
                                 return subreddit.data.length > 0 && (
-                                    <div key={`${subreddit.category_name}-${i}`}>
+                                    <section key={`${subreddit.category_name}-${i}`}>
                                         <h3 id={subreddit.category_name}>{subreddit.category_name}</h3>
                                         {subreddit.data.map((d: any) => {
                                             return <div key={`${d.subreddit_name}-${i}`}>
-                                                <h4 id={d.subreddit_name}>{d.subreddit_name}</h4>
+                                                <h4 id={d.subreddit_name} className="border">{d.subreddit_name}</h4>
                                                 <ul>
-                                                    {d.data.map((s: { data: { title: string, url: string } }) => {
+                                                    {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean } }) => {
                                                         return (
                                                             <li key={`${s.data.title}-${i}`}>
-                                                                <a href={s.data.url} target="__blank">{s.data.title}</a>
+                                                                <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
+                                                                <MessageTwoTone twoToneColor="#6f8ea3" style={{ marginLeft: '10px' }} /> <strong><small className="comments">{s.data.num_comments}</small></strong>
+                                                                <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
+                                                                <ul>
+                                                                    {s.data.all_awardings.map((a: any) => {
+                                                                        if (a.coin_rewards > 0) {
+                                                                            return <img src={a.resized_static_icons[0].url} alt={a.name} />
+                                                                        }
+                                                                    })}
+                                                                </ul>
                                                             </li>
                                                         )
                                                     })}
@@ -253,7 +262,7 @@ const User = () => {
                                             </div>
                                         })}
 
-                                    </div>
+                                    </section>
                                 )
                             })}
                         </div>
@@ -263,19 +272,34 @@ const User = () => {
                     {/** Display SELECTED category */}
 
                     {selectedCategory !== 'All' && (
-                        <div>
+                        <section>
                             {subreddits.length ?
                                 subreddits.map((d: any, i: number) => {
                                     return <div key={`${d.subreddit_name}-${i}`}>
-                                        <h4>{d.subreddit_name}</h4>
+                                        <h4 id={d.subreddit_name} className="border">{d.subreddit_name}</h4>
                                         <ul>
-                                            {d.data.map((s: { data: { title: string } }) => <li key={`${s.data.title}-${i}`}>{s.data.title}</li>)}
+                                            {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean } }) => {
+                                                return (
+                                                    <li key={`${s.data.title}-${i}`}>
+                                                        <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
+                                                        <MessageTwoTone twoToneColor="#6f8ea3" style={{ marginLeft: '10px' }} /> <strong><small className="comments">{s.data.num_comments}</small></strong>
+                                                        <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
+                                                        <ul style={{ marginLeft: '10px', display: 'inline-block' }}>
+                                                            {s.data.all_awardings.map((a: any) => {
+                                                                if (a.count > 0) {
+                                                                    return <img src={a.icon_url} style={{ height: '12px' }} alt={a.name} />
+                                                                }
+                                                            })}
+                                                        </ul>
+                                                    </li>
+                                                )
+                                            })}
                                         </ul>
                                     </div>
                                 })
                                 : <p>No Subreddits</p>}
 
-                        </div>
+                        </section>
                     )}
                 </div>
             ) : (
