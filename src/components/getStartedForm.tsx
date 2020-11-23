@@ -1,6 +1,8 @@
 import React from 'react';
 import { Formik, Field, Form, FieldArray } from 'formik';
 import Fetch from '../lib/fetch';
+import { validateCategorySubmit } from '../lib/validation';
+import { useState } from 'react';
 
 const initialValues = {
     subreddits: [
@@ -29,18 +31,22 @@ interface IFormData {
 
 const GetStartedForm = ({ formSubmit }: IProps) => {
     const request = new Fetch();
+    const [error, setError] = useState<string>('');
 
-    const handleSubmit = (async(values: IFormData) => {
+    const handleSubmit = (async (values: IFormData) => {
         try {
+            // const data = values.subreddits.map((s: { name: string }) => s.name);
+            // validateCategorySubmit(data);
             await request.updateSubreddits(values);
             formSubmit(values);
-        } catch(e) {
-            console.log(e)
-        } 
+        } catch (e) {
+            console.log(e);
+            setError(e.message);
+        }
     })
 
     return (
-        <div>
+        <div className="wrap">
             <h1>Invite subreddits</h1>
 
             <Formik
@@ -54,36 +60,36 @@ const GetStartedForm = ({ formSubmit }: IProps) => {
                                 <div>
                                     {values.subreddits.length > 0 &&
                                         values.subreddits.map((friend, index) => (
-                                            <div key={index}>
-                                                <div>
-                                                    <label htmlFor={`subreddits.${index}.name`}>Name</label>
+                                            <div className="settings-item" key={index}>
+                                                <label htmlFor={`subreddits.${index}.name`}>Subreddit</label>
+                                                <div className="settings-item-buttons">
                                                     <Field
                                                         name={`subreddits.${index}.name`}
                                                         placeholder="Jane Doe"
                                                         type="text"
+                                                        required
                                                     />
-
-                                                </div>
-                                                <div>
                                                     <button
                                                         type="button"
                                                         onClick={() => remove(index)}
                                                     >
-                                                        X
+                                                        Remove
                                                     </button>
                                                 </div>
                                             </div>
                                         ))}
                                     <button
                                         type="button"
-                                        onClick={() => push({ name: '', email: '' })}
+                                        onClick={() => push({ name: '' })}
+                                        style={{ marginBottom: '10px' }}
                                     >
-                                        Add Friend
+                                        Add Subreddit
                                     </button>
                                 </div>
                             )}
                         </FieldArray>
-                        <button type="submit">Invite</button>
+                        <button type="submit" disabled={values.subreddits.length ? false : true}>Submit</button>
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
                     </Form>
                 )}
             </Formik>

@@ -32,14 +32,23 @@ const CategoryListItem = ({ id, name, renameCategory, deleteCategory }: IProps) 
                     <p>{name}</p>
                 </div>
             ) : (
-                    <div>
-                        <input type="text" ref={inputRef} defaultValue={name} />
-                        <button onClick={handleOnSave}>Save</button>
-                        <button onClick={handleOnEdit}>Cancel</button>
+                    <div className="settings-item">
+                        <div style={{
+                            display: 'flex',
+                            width: '247px',
+                            marginRight: '20px'
+                        }}>
+                            <input type="text" ref={inputRef} defaultValue={name} />
+                        </div>
+
+                        <div className="settings-item-buttons">
+                            <button onClick={handleOnSave}>Save</button>
+                            <button onClick={handleOnEdit}>Cancel</button>
+                        </div>
                     </div>
                 )}
 
-        </li>
+        </li >
     ) : (
             <li key={`${name}`}>
                 {name === 'uncategorized' ? (
@@ -47,14 +56,16 @@ const CategoryListItem = ({ id, name, renameCategory, deleteCategory }: IProps) 
                         <p>{name}</p>
                     </div>
                 ) : (
-                        <div>
+                        <div className="settings-item">
                             <span>{name}</span>
-                            <button onClick={handleOnEdit}>edit</button>
-                            <button onClick={handleOnDelete}>delete</button>
+                            <div className="settings-item-buttons">
+                                <button onClick={handleOnEdit}>Edit</button>
+                                <button onClick={handleOnDelete}>Remove</button>
+                            </div>
                         </div>
-                    )}
-
-            </li>
+                    )
+                }
+            </li >
         )
 }
 

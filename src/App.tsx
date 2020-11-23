@@ -24,8 +24,7 @@ function App() {
                 <ul>
                     <li><Link to={'/'}>Home</Link></li>
                     {user && <div className="auth-links">
-                        <li>{user.username}</li>
-                        <li><Link to={'/settings'}>Settings</Link></li>
+                        <li><Link to={'/settings'}>{user.username}</Link></li>
                         <li><button onClick={logout}>logout</button></li>
                     </div>}
                 </ul>

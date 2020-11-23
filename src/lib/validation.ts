@@ -9,7 +9,7 @@ import { IGetStartedData } from '../components/dash';
 // check for empty fields
 
 /**
- * Check for duplicate category names when adding and renaming
+ * Check if category namem already exists when adding or renaming
  * 
  * @param values 
  * @param userCategories 
@@ -24,6 +24,14 @@ export const validateCategory = (values: { categories: { name: string }[] }, use
             };
         }
     }
+}
+
+/**
+ * Check for duplicate categories when submitting
+ */
+export const validateCategorySubmit = (values: string[]) => {
+    const isDuplicate = values.filter((item, index) => values.indexOf(item) !== index)
+    if (isDuplicate.length) { throw new Error('Duplicate entries found') }
 }
 
 export const validateDuplicateSubreddits = (values: IGetStartedData, userSubreddits: any) => {

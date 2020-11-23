@@ -5,7 +5,7 @@ import SubredditListItem from './subredditListItem';
 import CategoryListItem from './categoryListItem';
 import { ICategories } from './dash';
 import Fetch from '../lib/fetch';
-import { validateCategory, validateDuplicateSubreddits } from '../lib/validation';
+import { validateCategory, validateCategorySubmit, validateDuplicateSubreddits } from '../lib/validation';
 
 /**
  * Private Route
@@ -71,6 +71,8 @@ const Settings = () => {
          * https://javascript.info/async-await#error-handling
          */
         try {
+            const data = values.subreddits.map((s: { name: string }) => s.name);
+            validateCategorySubmit(data)
             validateDuplicateSubreddits(values, user.categories);
             try {
                 const req = await Promise.all(subreddits.map((s: { name: string }) => {
@@ -121,7 +123,8 @@ const Settings = () => {
         const res = await Promise.all(arr.map((v: { category: string; names: string[] }) => {
             const categoryName = v.category;
             const subreddits = user.categories.filter((c: { category_name: string }) => {
-                return c.category_name === categoryName})[0].data;
+                return c.category_name === categoryName
+            })[0].data;
             const data = {
                 category: categoryName,
                 subreddits: [...subreddits, ...v.names]
@@ -129,7 +132,7 @@ const Settings = () => {
 
             return request.updateSubreddit(data);
         }));
-    
+
         user.categories = res;
         const userState = user;
         userState['categories'] = res[0];
@@ -143,6 +146,8 @@ const Settings = () => {
         let userState;
 
         try {
+            const data = values.categories.map((s: { name: string }) => s.name);
+            validateCategorySubmit(data)
             validateCategory(values, user.categories, user.subreddits)
             try {
                 const res = await Promise.all(categories.map((c: { name: string }) => {
@@ -152,7 +157,7 @@ const Settings = () => {
                 setIsSubmitting(true);
                 user.categories = res;
                 userState = user;
-                userState['categories'] = res[res.length-1];
+                userState['categories'] = res[res.length - 1];
             } catch (e) {
                 throw new Error('Network error. Try again later.')
             }
@@ -235,170 +240,166 @@ const Settings = () => {
     }
 
     return isSubmitting ? <div>saving</div> : (
-        <div>
-            <h3>Categories</h3>
-            <p>List all user's categories</p>
-            <ul>
-                {user.categories.map((category: { category_id: number, category_name: string, subreddits: [] }, index: number) => {
-                    const { category_name, category_id } = category;
-                    return (
-                        <CategoryListItem
-                            key={`${category_name}-${index}`}
-                            id={category_id}
-                            name={category_name}
-                            renameCategory={renameCategory}
-                            deleteCategory={deleteCategory}
-                        />
-                    )
-                })}
-            </ul>
-            <Formik
-                initialValues={initialCategoryValues}
-                onSubmit={async (values) => {
-                    handleOnCategorySubmit(values);
-                }}
-            >
-                {({ values }) => (
-                    <Form>
-                        <FieldArray name="categories">
-                            {({ insert, remove, push }) => (
-                                <div>
-                                    {values.categories.length > 0 &&
-                                        values.categories.map((category, index) => (
-                                            <div className="row" key={index}>
-                                                <div className="col">
-                                                    <label htmlFor={`categories.${index}.name`}>Name</label>
-                                                    <Field
-                                                        name={`categories.${index}.name`}
-                                                        placeholder="Jane Doe"
-                                                        type="text"
-                                                        required
-                                                    />
-                                                    <ErrorMessage
-                                                        name={`categories.${index}.name`}
-                                                        component="div"
-                                                        className="field-error"
-                                                    />
+        <div className="wrap">
+            <section>
+                <h3>Categories</h3>
+                <ul>
+                    {user.categories.map((category: { category_id: number, category_name: string, subreddits: [] }, index: number) => {
+                        const { category_name, category_id } = category;
+                        return (
+                            <CategoryListItem
+                                key={`${category_name}-${index}`}
+                                id={category_id}
+                                name={category_name}
+                                renameCategory={renameCategory}
+                                deleteCategory={deleteCategory}
+                            />
+                        )
+                    })}
+                </ul>
+                <hr />
+                <Formik
+                    initialValues={initialCategoryValues}
+                    onSubmit={async (values) => {
+                        handleOnCategorySubmit(values);
+                    }}
+                >
+                    {({ values }) => (
+                        <Form>
+                            <FieldArray name="categories">
+                                {({ insert, remove, push }) => (
+                                    <div>
+                                        {values.categories.length > 0 &&
+                                            values.categories.map((category, index) => (
+                                                <div className="settings-item" key={index}>
+                                                    <label htmlFor={`categories.${index}.name`}>Category</label>
+                                                    <div className="settings-item-buttons">
+                                                        <Field
+                                                            name={`categories.${index}.name`}
+                                                            type="text"
+                                                            required
+                                                        />
+                                                        <ErrorMessage
+                                                            name={`categories.${index}.name`}
+                                                            component="div"
+                                                            className="field-error"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="secondary"
+                                                            onClick={() => remove(index)}
+                                                        >
+                                                            Remove
+                                                </button>
+                                                    </div>
                                                 </div>
-                                                <div className="col">
-                                                    <button
-                                                        type="button"
-                                                        className="secondary"
-                                                        onClick={() => remove(index)}
-                                                    >
-                                                        X
-                        </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    <button
-                                        type="button"
-                                        className="secondary"
-                                        onClick={() => push({ name: '' })}
-                                    >
-                                        Add Category
+                                            ))}
+                                        <button
+                                            type="button"
+                                            className="secondary"
+                                            onClick={() => push({ name: '' })}
+                                            style={{ marginBottom: '10px' }}
+                                        >
+                                            Add Category
                 </button>
-                                </div>
-                            )}
-                        </FieldArray>
-                        <button type="submit">Submit</button>
-                        {error && error.type === "category" && <span style={{ color: 'red' }}>{error.msg}</span>}
-                    </Form>
-                )}
-            </Formik>
+                                    </div>
+                                )}
+                            </FieldArray>
+                            <button type="submit" disabled={values.categories.length ? false : true}>Submit</button>
+                            {error && error.type === "category" && <p style={{ color: 'red' }}>{error.msg}</p>}
+                        </Form>
+                    )}
+                </Formik>
+            </section>
+            <section>
+                <h3>Subreddits</h3>
+                <ul>
+                    {user.categories.map((category: { category_id: number, category_name: string, data: [] }, index: number) => {
+                        const { category_name, data } = category;
+                        return (
+                            <div key={`${category_name}-${index}`}>
+                                <p><strong>{category_name} {data.length}</strong></p>
+                                {data.map((subreddit: string, index: number) => {
+                                    return (
+                                        <SubredditListItem
+                                            categories={user.categories}
+                                            category={category.category_name}
+                                            subredditName={subreddit}
+                                            key={`${subreddit}-${index}`}
+                                            deleteSub={handleOnDeleteSubreddit}
+                                            saveCategory={handleOnSaveCategory}
+                                        />
+                                    )
+                                })}
+                            </div>
+                        )
+                    })}
+                </ul>
+                <hr />
+                <Formik
+                    initialValues={initialSubredditValues}
+                    onSubmit={async (values) => {
+                        handleOnSubredditSubmit(values);
+                    }}
+                >
+                    {({ values }) => (
+                        <Form>
+                            <FieldArray name="subreddits">
+                                {({ insert, remove, push }) => (
+                                    <div>
+                                        {values.subreddits.length > 0 &&
+                                            values.subreddits.map((subreddit, index) => (
+                                                <div className="settings-item" key={index}>
+                                                    <label htmlFor={`subreddits.${index}.name`}>Subreddit</label>
+                                                    <div className="settings-item-buttons">
+                                                        <Field
+                                                            name={`subreddits.${index}.name`}
+                                                            placeholder="Jane Doe"
+                                                            type="text"
+                                                            required
+                                                        />
+                                                        <ErrorMessage
+                                                            name={`subreddits.${index}.name`}
+                                                            component="div"
+                                                            className="field-error"
+                                                        />
+                                                        <Field
+                                                            name={`subreddits.${index}.category`}
+                                                            as="select"
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {user.categories.map((category: { category_name: string }, i: number) => {
+                                                                return <option key={`${i}-${category.category_name}`} value={category.category_name}>{category.category_name}</option>
+                                                            })}
 
-
-            <h3>Subreddits</h3>
-            <p>List all user's subreddits along with it's category</p>
-            <ul>
-                {user.categories.map((category: { category_id: number, category_name: string, data: [] }, index: number) => {
-                    const { category_name, data } = category;
-                    return (
-                        <div key={`${category_name}-${index}`}>
-                            <p>{category_name} {data.length}</p>
-                            {data.map((subreddit: string, index: number) => {
-                                return (
-                                    <SubredditListItem
-                                        categories={user.categories}
-                                        category={category.category_name}
-                                        subredditName={subreddit}
-                                        key={`${subreddit}-${index}`}
-                                        deleteSub={handleOnDeleteSubreddit}
-                                        saveCategory={handleOnSaveCategory}
-                                    />
-                                )
-                            })}
-                        </div>
-                    )
-                })}
-            </ul>
-            <Formik
-                initialValues={initialSubredditValues}
-                onSubmit={async (values) => {
-                    handleOnSubredditSubmit(values);
-                }}
-            >
-                {({ values }) => (
-                    <Form>
-                        <FieldArray name="subreddits">
-                            {({ insert, remove, push }) => (
-                                <div>
-                                    {values.subreddits.length > 0 &&
-                                        values.subreddits.map((subreddit, index) => (
-                                            <div className="row" key={index}>
-                                                <div className="col">
-                                                    <label htmlFor={`subreddits.${index}.name`}>Name</label>
-                                                    <Field
-                                                        name={`subreddits.${index}.name`}
-                                                        placeholder="Jane Doe"
-                                                        type="text"
-                                                        required
-                                                    />
-                                                    <ErrorMessage
-                                                        name={`subreddits.${index}.name`}
-                                                        component="div"
-                                                        className="field-error"
-                                                    />
-                                                </div>
-                                                <div className="col">
-                                                    <label htmlFor={`subreddits.${index}.category`}>Category</label>
-                                                    <Field
-                                                        name={`subreddits.${index}.category`}
-                                                        as="select"
-                                                    >
-                                                        <option value="">Select</option>
-                                                        {user.categories.map((category: { category_name: string }, i: number) => {
-                                                            return <option key={`${i}-${category.category_name}`} value={category.category_name}>{category.category_name}</option>
-                                                        })}
-
-                                                    </Field>
-                                                </div>
-                                                <div className="col">
-                                                    <button
-                                                        type="button"
-                                                        className="secondary"
-                                                        onClick={() => remove(index)}
-                                                    >
-                                                        X
+                                                        </Field>
+                                                        <button
+                                                            type="button"
+                                                            className="secondary"
+                                                            onClick={() => remove(index)}
+                                                        >
+                                                            Remove
                         </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    <button
-                                        type="button"
-                                        className="secondary"
-                                        onClick={() => push({ name: '' })}
-                                    >
-                                        Add Subreddit
+                                            ))}
+                                        <button
+                                            type="button"
+                                            className="secondary"
+                                            onClick={() => push({ name: '' })}
+                                            style={{ marginBottom: '10px' }}
+                                        >
+                                            Add Subreddit
                 </button>
-                                </div>
-                            )}
-                        </FieldArray>
-                        <button type="submit">Submit</button>
-                        {error && error.type === "subreddit" && <span style={{ color: 'red' }}>{error.msg}</span>}
-                    </Form>
-                )}
-            </Formik>
+                                    </div>
+                                )}
+                            </FieldArray>
+                            <button type="submit" disabled={values.subreddits.length ? false : true}>Submit</button>
+                            {error && error.type === "subreddit" && <p style={{ color: 'red' }}>{error.msg}</p>}
+                        </Form>
+                    )}
+                </Formik>
+            </section>
         </div>
     )
 }

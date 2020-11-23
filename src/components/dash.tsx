@@ -44,6 +44,7 @@ const User = () => {
         const fetch = async () => {
             let req: ISubreddits[];;
             if (formSubmitting) {
+                console.log(user.categories)
                 req = await fetchSubsInitial();
             } else {
                 req = await fetchSubs();
@@ -80,6 +81,7 @@ const User = () => {
     }
 
     const fetchSubsInitial = async () => {
+        console.log(user.categories)
         const data: [IResponseData][] = await Promise.all(user.categories.map(async (category: ICategories) => {
             if (category.category_name === 'uncategorized') {
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
@@ -92,7 +94,7 @@ const User = () => {
                 return [];
             }
         }));
-
+        console.log(data)
         return build(data, user.categories);
     }
 
@@ -115,7 +117,7 @@ const User = () => {
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             }));
-            
+            console.log(data);
             return build(data, categories);
 
         } else {
@@ -128,7 +130,7 @@ const User = () => {
             const res = await Promise.all(category[0].map((subreddit: string) => (
                 fetch(`https://www.reddit.com/r/${subreddit}.json`))));
             const data = await Promise.all(res.map((r: any) => r.json()));
-
+            console.log(data);
             return build(data);
         }
     }
@@ -137,8 +139,9 @@ const User = () => {
      * Build the data structure
      */
     const build = (x: any, categories?: any) => {
+        console.log(x)
         let arr: any[] = [];
-        
+
         if (categories) {
             // loop through categories
             arr = categories.map((category: any, i: number) => {
@@ -146,8 +149,6 @@ const User = () => {
                 /**
                  *  When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                  */
-                
-                // const subreddits = category.data.length ? category.data : intialSubreddits;
                 const subreddits = category.data;
                 const data = subreddits.map((s: string, j: number) => {
                     const data: any = x[i][j];
@@ -189,7 +190,6 @@ const User = () => {
             {isSubredditsEmpty.length > 0 ? (
                 <div className="container">
                     <div className="category-col">
-                        <p>Category: {selectedCategory}</p>
                         <select name="categories" id="categories" onChange={changeCategory} value={selectedCategory}>
                             <option value="All">All</option>
                             {user.categories.map((category: ICategories, i: number) => {
@@ -200,11 +200,13 @@ const User = () => {
                             return (
                                 <div key={`${i}-${category}`}>
                                     <h3><a href={`#${category.category_name}`}>{category.category_name}</a></h3>
-                                    <ul>
-                                        {category.data.map((data: string, i: number) => {
-                                            return <li key={`${i}-${data}`}><a href={`#${data}`}>{data}</a></li>
-                                        })}
-                                    </ul>
+                                    {category.data.length ? (
+                                        <ul>
+                                            {category.data.map((data: string, i: number) => {
+                                                return <li key={`${i}-${data}`}><a href={`#${data}`}>{data}</a></li>
+                                            })}
+                                        </ul>
+                                    ) : <p>(none)</p>}
                                 </div>
                             )
                         }) :
@@ -233,14 +235,20 @@ const User = () => {
                     {selectedCategory === 'All' && (
                         <div>
                             {subreddits.map((subreddit: ISubreddits, i: number) => {
-                                return (
+                                return subreddit.data.length > 0 && (
                                     <div key={`${subreddit.category_name}-${i}`}>
                                         <h3 id={subreddit.category_name}>{subreddit.category_name}</h3>
                                         {subreddit.data.map((d: any) => {
                                             return <div key={`${d.subreddit_name}-${i}`}>
                                                 <h4 id={d.subreddit_name}>{d.subreddit_name}</h4>
                                                 <ul>
-                                                    {d.data.map((s: { data: { title: string } }) => <li key={`${s.data.title}-${i}`}>{s.data.title}</li>)}
+                                                    {d.data.map((s: { data: { title: string, url: string } }) => {
+                                                        return (
+                                                            <li key={`${s.data.title}-${i}`}>
+                                                                <a href={s.data.url} target="__blank">{s.data.title}</a>
+                                                            </li>
+                                                        )
+                                                    })}
                                                 </ul>
                                             </div>
                                         })}
@@ -256,7 +264,6 @@ const User = () => {
 
                     {selectedCategory !== 'All' && (
                         <div>
-
                             {subreddits.length ?
                                 subreddits.map((d: any, i: number) => {
                                     return <div key={`${d.subreddit_name}-${i}`}>
