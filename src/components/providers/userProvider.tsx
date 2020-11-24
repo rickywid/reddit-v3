@@ -21,17 +21,15 @@ const UserProvider = ({ children }: any) => {
         const fetch = new Fetch();
         const request = async () => {
             try {
-                // const user: IUser = await fetch.getUser(userId);
                 const user: IUser = await fetch.getUser();
-                console.log(user)
                 setUser(user);
                 setLoading(false);
             } catch (e) {
                 console.log(e)
+                window.location.replace('http://localhost:3000');
             }
         }
         request();
-        // if (user || userId) { request() } else { setLoading(false)};
 
     }, []);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import UserContext from '../context/userContext';
 import GetStartedForm from './getStartedForm';
-import { MessageTwoTone, LoadingOutlined, RedditOutlined } from '@ant-design/icons';
+import { MessageTwoTone, LoadingOutlined, RedditCircleFilled, VideoCameraTwoTone, StarTwoTone, PictureTwoTone } from '@ant-design/icons';
 import moment from 'moment';
 
 // Todo: Clean up interfaces
@@ -182,7 +182,7 @@ const User = () => {
     const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
 
     return isLoading ? <div><LoadingOutlined /></div> : (
-        <div>
+        <div style={{margin: 'auto'}}>
             {isSubredditsEmpty.length > 0 ? (
                 <div className="container">
                     <div className="category-col">
@@ -203,7 +203,7 @@ const User = () => {
                                                     return <li key={`${i}-${data}`}><a href={`#${data}`} className="category-subreddit-item">{data}</a></li>
                                                 })}
                                             </ul>
-                                        ) : <p>(none)</p>}
+                                        ) : <p className="category-subreddit-item none">(none)</p>}
                                     </div>
                                 )
                             }) :
@@ -223,8 +223,8 @@ const User = () => {
                                     return <div></div>
                                 })
                             }
-                            <ul style={{marginTop: '50px'}}>
-                                <li><a href="https://reddit.com" className="visit-reddit"><RedditOutlined style={{marginRight: '10px'}} />Visit Reddit</a></li>
+                            <ul style={{ marginTop: '50px' }}>
+                                <li><a href="https://reddit.com" className="visit-reddit"><RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit</a></li>
                             </ul>
                         </aside>
                     </div>
@@ -242,20 +242,21 @@ const User = () => {
                                             return <div key={`${d.subreddit_name}-${i}`}>
                                                 <h4 id={d.subreddit_name} className="border">{d.subreddit_name}</h4>
                                                 <ul>
-                                                    {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean } }) => {
+                                                    {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean, permalink: string, is_video: boolean, gilded: number, thumbnail: string } }) => {
                                                         return (
                                                             <li key={`${s.data.title}-${i}`}>
-                                                                <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
-                                                                <MessageTwoTone twoToneColor="#6f8ea3" style={{ marginLeft: '10px' }} /> <strong><small className="comments">{s.data.num_comments}</small></strong>
-                                                                <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
-                                                                <ul>
-                                                                    {s.data.all_awardings.map((a: any) => {
-                                                                        if (a.coin_rewards > 0) {
-                                                                            return <img src={a.resized_static_icons[0].url} alt={a.name} />
-                                                                        }
-                                                                    })}
-                                                                </ul>
-                                                            </li>
+                                                            <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
+                                                            {s.data.gilded > 0 && <span style={{ marginRight: '5px' }}><StarTwoTone twoToneColor="#ff9800" /></span>}
+                                                            {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
+                                                            {s.data.thumbnail && s.data.thumbnail !== 'self' && s.data.thumbnail !== 'default' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
+                                                            {s.data.all_awardings.map((a: any) => {
+                                                                if (a.count > 0) {
+                                                                    return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
+                                                                }
+                                                            })}
+                                                            <a className="comments" href={`https://reddit.com/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
+                                                            <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
+                                                        </li>
                                                         )
                                                     })}
                                                 </ul>
@@ -278,19 +279,20 @@ const User = () => {
                                     return <div key={`${d.subreddit_name}-${i}`}>
                                         <h4 id={d.subreddit_name} className="border">{d.subreddit_name}</h4>
                                         <ul>
-                                            {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean } }) => {
+                                            {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean, permalink: string, is_video: boolean, gilded: number, thumbnail: string } }) => {
                                                 return (
                                                     <li key={`${s.data.title}-${i}`}>
                                                         <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
-                                                        <MessageTwoTone twoToneColor="#6f8ea3" style={{ marginLeft: '10px' }} /> <strong><small className="comments">{s.data.num_comments}</small></strong>
+                                                        {s.data.gilded > 0 && <span style={{ marginRight: '5px' }}><StarTwoTone twoToneColor="#ff9800" /></span>}
+                                                        {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
+                                                        {s.data.thumbnail && s.data.thumbnail !== 'self' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
+                                                        {s.data.all_awardings.map((a: any) => {
+                                                            if (a.count > 0) {
+                                                                return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
+                                                            }
+                                                        })}
+                                                        <a className="comments" href={`https://reddit.com/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
                                                         <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
-                                                        <ul style={{ marginLeft: '10px', display: 'inline-block' }}>
-                                                            {s.data.all_awardings.map((a: any) => {
-                                                                if (a.count > 0) {
-                                                                    return <img src={a.icon_url} style={{ height: '12px' }} alt={a.name} />
-                                                                }
-                                                            })}
-                                                        </ul>
                                                     </li>
                                                 )
                                             })}
@@ -304,9 +306,6 @@ const User = () => {
                 </div>
             ) : (
                     <div>
-                        <h2>Start Adding Your Favourite Subreddits</h2>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima, eveniet soluta, praesentium ea ut repudiandae, perspiciatis neque corrupti perferendis!</p>
-
                         <GetStartedForm formSubmit={formSubmit} />
                     </div>
                 )}

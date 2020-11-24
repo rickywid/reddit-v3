@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Formik, Field, Form, ErrorMessage, FieldArray } from 'formik';
 import UserContext from '../context/userContext';
 import SubredditListItem from './subredditListItem';
@@ -29,9 +29,6 @@ const initialCategoryValues = {
 };
 
 const Settings = () => {
-    useEffect(() => {
-        console.log('settings mounted')
-    })
     const { user, setUser } = useContext(UserContext);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<{ type: string, msg: string } | null>(null);
@@ -321,7 +318,7 @@ const Settings = () => {
                         return (
                             <div key={`${category_name}-${index}`}>
                                 <p><strong>{category_name}</strong></p>
-                                {data.map((subreddit: string, index: number) => {
+                                {data.length ? data.map((subreddit: string, index: number) => {
                                     return (
                                         <SubredditListItem
                                             categories={user.categories}
@@ -332,7 +329,7 @@ const Settings = () => {
                                             saveCategory={handleOnSaveCategory}
                                         />
                                     )
-                                })}
+                                }): <small>(empty)</small>}
                             </div>
                         )
                     })}

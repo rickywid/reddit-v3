@@ -47,8 +47,8 @@ const GetStartedForm = ({ formSubmit }: IProps) => {
 
     return (
         <div className="wrap">
-            <h1>Invite subreddits</h1>
-
+            <h1>Get Started</h1>
+            <p style={{marginBottom: '50px'}}>Add all of your favourite subreddits and easily customize and manage your list.</p>
             <Formik
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
@@ -61,7 +61,7 @@ const GetStartedForm = ({ formSubmit }: IProps) => {
                                     {values.subreddits.length > 0 &&
                                         values.subreddits.map((friend, index) => (
                                             <div className="settings-item" key={index}>
-                                                <label htmlFor={`subreddits.${index}.name`}>r/</label>
+                                                <label htmlFor={`subreddits.${index}.name`}>subreddit</label>
                                                 <div className="settings-item-buttons">
                                                     <Field
                                                         name={`subreddits.${index}.name`}

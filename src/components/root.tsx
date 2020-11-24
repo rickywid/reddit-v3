@@ -5,9 +5,8 @@ import UserContext from '../context/userContext';
 
 const Root = () => {
     const {user, setUser} = useContext(UserContext);
-    console.log(user)
     return (
-        <div>
+        <div style={{height: '90vh', display: 'flex'}}>
             {!user ? <Landing /> : <Dash />}
         </div>
     )

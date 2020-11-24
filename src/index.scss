@@ -33,6 +33,10 @@ a {
     }
 }
 
+svg {
+    height: 20px;
+}
+
 ul {
     margin: 0;
     padding: 0;
@@ -68,12 +72,40 @@ button.sub-save-btn {
     color: white;
 }
 button:disabled {
-    border: 3px solid #396497;
+    border: 3px solid #75889d;
     background: #ececec;
     color: grey;
+    cursor: initial;
 
     &:hover {
         color: grey;
+    }
+}
+
+button.signout {
+    border: none;
+    font-weight: normal;
+    color: grey;
+    width: auto;
+    padding: 0;
+
+    &:hover{
+        background: none;
+        color: #0072ff;
+    }
+}
+
+.sub-submit-btn {
+    border: 3px solid #0072ff;
+    background: #0072ff;
+    color: white;
+    padding: 5px 0;
+}
+
+.sub-submit-btn:enabled { 
+    &:hover {
+        border:3px solid #0052b6;
+        background:#0052b6;
     }
 }
 
@@ -141,7 +173,11 @@ nav {
     .comments,
     .created {
         color: #6f8ea3;
-        margin-right: 10px;
+        margin-left: 5px;
+    }
+
+    .created {
+        margin-left: 10px;
     }
 
     .category-subreddit-item {
@@ -152,6 +188,10 @@ nav {
             color: #0072ff;
         }
     }
+
+    .category-subreddit-item.none:hover {
+        color: #8b8b8b;
+    }
 }
 
 .category-col {
@@ -160,6 +200,8 @@ nav {
 
 .wrap {
     width: 800px;
+    margin: auto;
+
     .settings-item {
         display: flex;
         justify-content: space-between;
@@ -193,14 +235,49 @@ nav {
     }
 }
 
-.sub-submit-btn {
-    border: #0072ff;
-    background: #0072ff;
-    color: white;
-    padding: 10px 0;
+.login-btn-group {
+    display: flex;
+    justify-content: space-between;
+    width: 850px;
 
-    &:hover {
-        background:#0052b6;
+    button {
+        width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 0;
+        border: 1px solid #bfbfbf;
+
+        &.btn-facebook,
+        &.btn-facebook:hover {
+            background: #1976d2;
+            border: 1px solid #1976d2;
+            color: white;
+        }
+
+        &.btn-twitter,
+        &.btn-twitter:hover {
+            background: #1da1f2;
+            border: 1px solid #1da1f2;;
+            color: white;
+        }
+
+        &.btn-github,
+        &.btn-github:hover {
+            background: black;
+            color: white;
+        }
+
+        &:hover {
+            background: none;
+            color: black;
+        }
+
+        svg {
+                height: 20px;
+                width: 20px;
+                margin-right: 10px;
+        }
     }
 }
 
@@ -222,6 +299,17 @@ nav {
             aside {
                 display: none;
             }
+        }
+    }
+
+    .login-btn-group {
+        display: initial;
+        justify-content: initial;
+        width: auto;
+    
+        button {
+            width: 100%;
+            margin-top: 15px;
         }
     }
 }
@@ -287,7 +375,12 @@ nav {
         }
     }
 
-    @media only screen and (max-width: 380px) { 
+    @media only screen and (max-width: 386px) { 
+
+        button:disabled {
+            margin-top: 10px;
+        }
+
         .settings-item-buttons {
             .sub-save-btn {
                 margin-top: 10px;
