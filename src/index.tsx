@@ -9,6 +9,8 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 
+console.log('environment: ', process.env.NODE_ENV)
+
 ReactDOM.render(
     <React.StrictMode>
         <UserProvider>
