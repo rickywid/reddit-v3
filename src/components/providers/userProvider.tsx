@@ -25,7 +25,7 @@ const UserProvider = ({ children }: any) => {
                 setLoading(false);
             } catch (e) {
                 console.log(e)
-                window.location.replace(`${process.env.REACT_APP_CLIENT}`);
+                // window.location.replace(`${process.env.REACT_APP_CLIENT}`);
             }
         }
         request();

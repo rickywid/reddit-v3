@@ -9,6 +9,7 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 
+console.log(process.env)
 console.log('environment: ', process.env.NODE_ENV)
 
 ReactDOM.render(
