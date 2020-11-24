@@ -73,7 +73,7 @@ const Settings = () => {
             validateDuplicateSubreddits(values, user.categories);
             try {
                 const req = await Promise.all(subreddits.map((s: { name: string }) => {
-                    return fetch(`https://www.reddit.com/r/${s.name}.json`);
+                    return fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${s.name}.json`);
                 })).catch(e => {
                     console.log(e)
                     throw new Error('Invalid Subreddit');

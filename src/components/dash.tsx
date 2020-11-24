@@ -34,12 +34,13 @@ export interface IGetStartedData {
 
 
 const User = () => {
+    const getCategory = localStorage.getItem('selectedCategory');
     const { user, setUser } = useContext(UserContext);
-    const [selectedCategory, setCategory] = useState<string>(localStorage.getItem('selectedCategory') || 'All');            // Selected Category value
-    const [intialSubreddits, setInitialSubreddits] = useState<string[]>([]);    // State will be instantiated if user has no subreddits
-    const [subreddits, setSubs] = useState<ISubreddits[]>([]);                  // State will be instantiated after fetchSubs() is ran
-    const [isLoading, setIsLoading] = useState<boolean>(true);                  // Check if fetch requests has completed
-    const [formSubmitting, setFormSubmitting] = useState<boolean>(false);       // Check if the form is currently being submitted when <GetStartedForm /> component is mounted
+    const [selectedCategory, setCategory] = useState<string>(getCategory || 'All');     // Selected Category value
+    const [intialSubreddits, setInitialSubreddits] = useState<string[]>([]);            // State will be instantiated if user has no subreddits
+    const [subreddits, setSubs] = useState<ISubreddits[]>([]);                          // State will be instantiated after fetchSubs() is ran
+    const [isLoading, setIsLoading] = useState<boolean>(true);                          // Check if fetch requests has completed
+    const [formSubmitting, setFormSubmitting] = useState<boolean>(false);               // Check if the form is currently being submitted when <GetStartedForm /> component is mounted
 
     useEffect(() => {
         const fetch = async () => {
@@ -87,7 +88,7 @@ const User = () => {
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                 // const subreddits = category.data.length ? category.data : ;
                 const res = await Promise.all(category.data.map(subreddit => (
-                    fetch(`https://www.reddit.com/r/${subreddit}.json`))));
+                    fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${subreddit}.json`))));
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             } else {
@@ -112,7 +113,7 @@ const User = () => {
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                 const subreddits = category.data.length ? category.data : intialSubreddits;
                 const res = await Promise.all(subreddits.map(subreddit => (
-                    fetch(`https://www.reddit.com/r/${subreddit}.json`))));
+                    fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${subreddit}.json`))));
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             }));
@@ -126,7 +127,7 @@ const User = () => {
             if (!category.length) { return []; }
 
             const res = await Promise.all(category[0].map((subreddit: string) => (
-                fetch(`https://www.reddit.com/r/${subreddit}.json`))));
+                fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${subreddit}.json`))));
             const data = await Promise.all(res.map((r: any) => r.json()));
             return build(data);
         }
@@ -224,7 +225,7 @@ const User = () => {
                                 })
                             }
                             <ul style={{ marginTop: '50px' }}>
-                                <li><a href="https://reddit.com" className="visit-reddit"><RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit</a></li>
+                                <li><a href={process.env.REACT_APP_REDDIT_URL} className="visit-reddit"><RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit</a></li>
                             </ul>
                         </aside>
                     </div>
@@ -254,7 +255,7 @@ const User = () => {
                                                                     return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
                                                                 }
                                                             })}
-                                                            <a className="comments" href={`https://reddit.com/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
+                                                            <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
                                                             <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
                                                         </li>
                                                         )
@@ -291,7 +292,7 @@ const User = () => {
                                                                 return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
                                                             }
                                                         })}
-                                                        <a className="comments" href={`https://reddit.com/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
+                                                        <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
                                                         <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
                                                     </li>
                                                 )

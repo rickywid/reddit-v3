@@ -6,7 +6,7 @@ class Fetch {
         }
     }
 
-    private domain = 'http://localhost:5000/api'
+    private domain = `${process.env.REACT_APP_SERVER}/api`
 
     async login(url:string) {
         this.options['method'] = 'GET';
@@ -18,11 +18,6 @@ class Fetch {
         this.options['method'] = 'GET';
         this.request(url, this.options)
     }
-
-    // getUser(id:string) {
-    //     this.options['method'] = 'GET';
-    //     return this.request(`/user/${id}`, this.options)
-    // }
 
     getUser() {
         this.options['method'] = 'GET';
