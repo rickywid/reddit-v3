@@ -1,8 +1,9 @@
 import React, { useEffect, useContext, useState } from 'react';
 import UserContext from '../context/userContext';
 import GetStartedForm from './getStartedForm';
-import { MessageTwoTone, LoadingOutlined, RedditCircleFilled, VideoCameraTwoTone, StarTwoTone, PictureTwoTone } from '@ant-design/icons';
-import moment from 'moment';
+import { LoadingOutlined, RedditCircleFilled } from '@ant-design/icons';
+import CategoryAside from './categoryAside';
+import Body from './body';
 
 // Todo: Clean up interfaces
 export interface ICategories {
@@ -16,7 +17,7 @@ interface IResponseData {
     }[]
 }
 
-interface ISubreddits {
+export interface ISubreddits {
     category_name: string,
     data: {
         subreddit_name: string;
@@ -183,7 +184,7 @@ const User = () => {
     const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
 
     return isLoading ? <div><LoadingOutlined /></div> : (
-        <div style={{margin: 'auto'}}>
+        <div style={{ margin: 'auto' }}>
             {isSubredditsEmpty.length > 0 ? (
                 <div className="container">
                     <div className="category-col">
@@ -194,116 +195,23 @@ const User = () => {
                             })}
                         </select>
                         <aside>
-                            {selectedCategory === 'All' ? user.categories.map((category: ICategories, i: number) => {
-                                return (
-                                    <div key={`${i}-${category}`}>
-                                        <h5><a href={`#${category.category_name}`}>{category.category_name}</a></h5>
-                                        {category.data.length ? (
-                                            <ul>
-                                                {category.data.map((data: string, i: number) => {
-                                                    return <li key={`${i}-${data}`}><a href={`#${data}`} className="category-subreddit-item">{data}</a></li>
-                                                })}
-                                            </ul>
-                                        ) : <p className="category-subreddit-item none">(none)</p>}
-                                    </div>
-                                )
-                            }) :
-                                user.categories.map((category: ICategories, i: number) => {
-                                    if (category.category_name === selectedCategory) {
-                                        return (
-                                            <div key={`${i}-${category}`}>
-                                                <ul>
-                                                    {category.data.map((data: string, i: number) => {
-                                                        return <li key={`${i}-${data}`}><a href={`#${data}`} className="category-subreddit-item">{data}</a></li>
-                                                    })}
-                                                </ul>
-                                            </div>
-                                        )
-                                    }
-
-                                    return <div></div>
-                                })
-                            }
+                            <CategoryAside
+                                selectedCategory={selectedCategory}
+                                categories={user.categories}
+                            />
                             <ul style={{ marginTop: '50px' }}>
-                                <li><a href={process.env.REACT_APP_REDDIT_URL} className="visit-reddit"><RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit</a></li>
+                                <li>
+                                    <a href={process.env.REACT_APP_REDDIT_URL} className="visit-reddit">
+                                        <RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit
+                                    </a>
+                                </li>
                             </ul>
                         </aside>
                     </div>
-
-
-                    {/** Display ALL categories */}
-
-                    {selectedCategory === 'All' && (
-                        <div>
-                            {subreddits.map((subreddit: ISubreddits, i: number) => {
-                                return subreddit.data.length > 0 && (
-                                    <section key={`${subreddit.category_name}-${i}`}>
-                                        <h3 id={subreddit.category_name}>{subreddit.category_name}</h3>
-                                        {subreddit.data.map((d: any) => {
-                                            return <div key={`${d.subreddit_name}-${i}`}>
-                                                <h4 id={d.subreddit_name} className="border">{d.subreddit_name}</h4>
-                                                <ul>
-                                                    {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean, permalink: string, is_video: boolean, gilded: number, thumbnail: string } }) => {
-                                                        return (
-                                                            <li key={`${s.data.title}-${i}`}>
-                                                            <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
-                                                            {s.data.gilded > 0 && <span style={{ marginRight: '5px' }}><StarTwoTone twoToneColor="#ff9800" /></span>}
-                                                            {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
-                                                            {s.data.thumbnail && s.data.thumbnail !== 'self' && s.data.thumbnail !== 'default' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
-                                                            {s.data.all_awardings.map((a: any) => {
-                                                                if (a.count > 0) {
-                                                                    return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
-                                                                }
-                                                            })}
-                                                            <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
-                                                            <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
-                                                        </li>
-                                                        )
-                                                    })}
-                                                </ul>
-                                            </div>
-                                        })}
-
-                                    </section>
-                                )
-                            })}
-                        </div>
-                    )}
-
-
-                    {/** Display SELECTED category */}
-
-                    {selectedCategory !== 'All' && (
-                        <section>
-                            {subreddits.length ?
-                                subreddits.map((d: any, i: number) => {
-                                    return <div key={`${d.subreddit_name}-${i}`}>
-                                        <h4 id={d.subreddit_name} className="border">{d.subreddit_name}</h4>
-                                        <ul>
-                                            {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean, permalink: string, is_video: boolean, gilded: number, thumbnail: string } }) => {
-                                                return (
-                                                    <li key={`${s.data.title}-${i}`}>
-                                                        <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
-                                                        {s.data.gilded > 0 && <span style={{ marginRight: '5px' }}><StarTwoTone twoToneColor="#ff9800" /></span>}
-                                                        {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
-                                                        {s.data.thumbnail && s.data.thumbnail !== 'self' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
-                                                        {s.data.all_awardings.map((a: any) => {
-                                                            if (a.count > 0) {
-                                                                return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
-                                                            }
-                                                        })}
-                                                        <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
-                                                        <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
-                                                    </li>
-                                                )
-                                            })}
-                                        </ul>
-                                    </div>
-                                })
-                                : <p>No Subreddits</p>}
-
-                        </section>
-                    )}
+                    <Body
+                        selectedCategory={selectedCategory}
+                        subreddits={subreddits}
+                    />
                 </div>
             ) : (
                     <div>
