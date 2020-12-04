@@ -56,6 +56,7 @@ const User = () => {
         }
 
         fetch();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCategory, formSubmitting]);
 
     const changeCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -183,7 +184,7 @@ const User = () => {
     const isSubredditsEmpty = user.categories.filter((c: any) => c.data.length > 0);
 
     return isLoading ? <div><LoadingOutlined /></div> : (
-        <div style={{margin: 'auto'}}>
+        <div style={{ margin: 'auto' }}>
             {isSubredditsEmpty.length > 0 ? (
                 <div className="container">
                     <div className="category-col">
@@ -246,18 +247,17 @@ const User = () => {
                                                     {d.data.map((s: { data: { title: string, url: string, num_comments: number, created_utc: number, all_awardings: any[], stickied: boolean, permalink: string, is_video: boolean, gilded: number, thumbnail: string } }) => {
                                                         return (
                                                             <li key={`${s.data.title}-${i}`}>
-                                                            <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
-                                                            {s.data.gilded > 0 && <span style={{ marginRight: '5px' }}><StarTwoTone twoToneColor="#ff9800" /></span>}
-                                                            {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
-                                                            {s.data.thumbnail && s.data.thumbnail !== 'self' && s.data.thumbnail !== 'default' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
-                                                            {s.data.all_awardings.map((a: any) => {
-                                                                if (a.count > 0) {
-                                                                    return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
-                                                                }
-                                                            })}
-                                                            <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
-                                                            <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
-                                                        </li>
+                                                                <a href={s.data.url} target="__blank" className={s.data.stickied ? 'sticky' : ''} style={{ marginRight: '10px' }}>{s.data.title}</a>
+                                                                {s.data.gilded > 0 && <span style={{ marginRight: '5px' }}><StarTwoTone twoToneColor="#ff9800" /></span>}
+                                                                {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
+                                                                {s.data.thumbnail && s.data.thumbnail !== 'self' && s.data.thumbnail !== 'default' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
+                                                                {s.data.all_awardings.map((a: any) => {
+                                                                    return a.count > 0 ? <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span> : ''
+
+                                                                })}
+                                                                <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
+                                                                <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
+                                                            </li>
                                                         )
                                                     })}
                                                 </ul>
@@ -288,9 +288,8 @@ const User = () => {
                                                         {s.data.is_video && <span style={{ marginRight: '5px' }}><VideoCameraTwoTone /></span>}
                                                         {s.data.thumbnail && s.data.thumbnail !== 'self' && <span style={{ marginRight: '5px' }}> <PictureTwoTone /></span>}
                                                         {s.data.all_awardings.map((a: any) => {
-                                                            if (a.count > 0) {
-                                                                return <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span>
-                                                            }
+                                                            return a.count > 0 ? <span><img src={a.icon_url} style={{ height: '12px' }} alt={a.name} /></span> : ''
+
                                                         })}
                                                         <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${s.data.permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{s.data.num_comments}</small></strong></a>
                                                         <small className="created">{moment(s.data.created_utc * 1000).fromNow()}</small>
