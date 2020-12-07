@@ -4,6 +4,7 @@ import GetStartedForm from './getStartedForm';
 import { LoadingOutlined, RedditCircleFilled } from '@ant-design/icons';
 import CategoryAside from './categoryAside';
 import Body from './body';
+import { redditURL } from '../lib/const';
 
 // Todo: Clean up interfaces
 export interface ICategories {
@@ -89,7 +90,7 @@ const User = () => {
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                 // const subreddits = category.data.length ? category.data : ;
                 const res = await Promise.all(category.data.map(subreddit => (
-                    fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${subreddit}.json`))));
+                    fetch(`${redditURL}/r/${subreddit}.json`))));
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             } else {
@@ -114,7 +115,7 @@ const User = () => {
                 // When the user first logs into the site, user's subreddit data will be empty. In that case, use that the values from initialSubreddits
                 const subreddits = category.data.length ? category.data : intialSubreddits;
                 const res = await Promise.all(subreddits.map(subreddit => (
-                    fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${subreddit}.json`))));
+                    fetch(`${redditURL}/r/${subreddit}.json`))));
                 const req = await Promise.all(res.map(r => r.json()));
                 return req;
             }));
@@ -128,7 +129,7 @@ const User = () => {
             if (!category.length) { return []; }
 
             const res = await Promise.all(category[0].map((subreddit: string) => (
-                fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${subreddit}.json`))));
+                fetch(`${redditURL}/r/${subreddit}.json`))));
             const data = await Promise.all(res.map((r: any) => r.json()));
             return build(data);
         }
@@ -201,7 +202,7 @@ const User = () => {
                             />
                             <ul style={{ marginTop: '50px' }}>
                                 <li>
-                                    <a href={process.env.REACT_APP_REDDIT_URL} className="visit-reddit">
+                                    <a href={redditURL} className="visit-reddit">
                                         <RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit
                                     </a>
                                 </li>
