@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { MessageTwoTone, VideoCameraTwoTone, StarTwoTone, PictureTwoTone } from '@ant-design/icons';
+import { redditURL } from '../lib/const';
 
 interface IProps {
     title: string,
@@ -30,7 +31,7 @@ const SubredditLink = ({ title, url, num_comments, created_utc, all_awardings, s
                     </span>
                 ) : '';
             })}
-            <a className="comments" href={`${process.env.REACT_APP_REDDIT_URL}/${permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{num_comments}</small></strong></a>
+            <a className="comments" href={`${redditURL}/${permalink}`} target="__blank"><MessageTwoTone twoToneColor="#6f8ea3" /> <strong><small>{num_comments}</small></strong></a>
             <small className="created">{moment(created_utc * 1000).fromNow()}</small>
         </li>
     )

@@ -1,3 +1,5 @@
+import { domain } from "./const";
+
 class Fetch {
     private options: any = {
         credentials: 'include',
@@ -6,7 +8,7 @@ class Fetch {
         }
     }
 
-    private domain = `${process.env.REACT_APP_SERVER}/api`
+    private domain = `${domain}/api`
 
     async login(url:string) {
         this.options['method'] = 'GET';

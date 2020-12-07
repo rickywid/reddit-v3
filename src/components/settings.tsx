@@ -6,6 +6,7 @@ import CategoryListItem from './categoryListItem';
 import { ICategories } from './dash';
 import Fetch from '../lib/fetch';
 import { validateCategory, validateCategorySubmit, validateDuplicateSubreddits } from '../lib/validation';
+import { redditURL } from '../lib/const';
 
 /**
  * Private Route
@@ -73,7 +74,7 @@ const Settings = () => {
             validateDuplicateSubreddits(values, user.categories);
             try {
                 const req = await Promise.all(subreddits.map((s: { name: string }) => {
-                    return fetch(`${process.env.REACT_APP_REDDIT_URL}/r/${s.name}.json`);
+                    return fetch(`${redditURL}/r/${s.name}.json`);
                 })).catch(e => {
                     console.log(e)
                     throw new Error('Invalid Subreddit');
