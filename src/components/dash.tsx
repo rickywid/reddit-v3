@@ -200,13 +200,11 @@ const User = () => {
                                 selectedCategory={selectedCategory}
                                 categories={user.categories}
                             />
-                            <ul style={{ marginTop: '50px' }}>
-                                <li>
-                                    <a href={redditURL} className="visit-reddit">
-                                        <RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit
-                                    </a>
-                                </li>
-                            </ul>
+                            <div style={{ marginTop: '50px' }}>
+                                <a href={redditURL} className="visit-reddit">
+                                    <RedditCircleFilled style={{ marginRight: '10px' }} />Visit Reddit
+                                </a>
+                            </div>
                         </aside>
                     </div>
                     <Body
