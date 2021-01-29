@@ -241,7 +241,7 @@ const Settings = () => {
         <div className="wrap">
             <section>
                 <h4>Categories</h4>
-                <ul>
+                <ul className="categories-list">
                     {user.categories.map((category: { category_id: number, category_name: string, data: [] }, index: number) => {
                         const { category_name, category_id } = category;
                         return (

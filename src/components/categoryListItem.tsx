@@ -50,11 +50,19 @@ const CategoryListItem = ({ id, name, renameCategory, deleteCategory, count }: I
             <li key={`${name}`}>
                 {name === 'uncategorized' ? (
                     <div>
-                        <p className={`${name === 'uncategorized' ? 'uncategorized' : ''}`}>{name} <small>{count}</small></p>
+                        <p className={`${name === 'uncategorized' ? 'uncategorized' : ''}`}>
+                            <div className="count">
+                                <small>{count}</small>
+                            </div>
+                            <span>{name}</span>
+                        </p>
                     </div>
                 ) : (
                         <div className="settings-item">
-                            <span>{name} <small>{count}</small></span>
+                            <div className="count">
+                                <small>{count}</small>
+                            </div>
+                            <span>{name}</span>
                             <div className="settings-item-buttons">
                                 <button onClick={handleOnEdit}>Edit</button>
                                 <button onClick={handleOnDelete}>Remove</button>
