@@ -158,15 +158,14 @@ nav {
     background: #FF4500;
     color: white;
     width: 150px;
-    display: inline-block;
-    border: 3px solid #FF4500;
-    text-align: center;
-    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    font-weight: 700;
     padding: 5px 0;
     font-size: 13.333px;
 
     &:hover {
-        background: #FF4500;
+        background: #dd3e05;
         color: white;
     }
 }
@@ -205,6 +204,9 @@ nav {
 
 .category-col {
     margin-right: 50px;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
 }
 
 .wrap {
